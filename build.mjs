@@ -14,7 +14,9 @@ const THEME = path.resolve(process.env.THEME_DIR || path.join(ROOT, '../0kcals-t
 const BUILD = path.join(ROOT, '.build');
 const OUT = path.join(ROOT, 'dist');
 const BASE = (process.env.BASE_PATH ?? '/0kcals').replace(/\/+$/, '');
-const WA_NUMBER = '4915752643541';
+// Demo mode: 0k-shim.js intercepts every wa.me link, so no real phone number ships.
+const WA_PLACEHOLDER = '0';
+const SETTINGS_OVERRIDES = { 'page-drop002': { wa_number: WA_PLACEHOLDER } };
 
 const read = (p) => fs.readFileSync(p, 'utf8');
 const readJSON = (p) => JSON.parse(read(p));
@@ -83,7 +85,7 @@ const emptyCart = { item_count: 0, total_price: 0, items: [] };
 const pedidoSrc = read(path.join(THEME, 'sections/page-pedido.liquid'));
 const shimData = {
   base: BASE,
-  wa: WA_NUMBER,
+  wa: WA_PLACEHOLDER,
   waIcon: (pedidoSrc.match(/<svg width="22"[\s\S]*?<\/svg>/) || [''])[0],
   variants: Object.fromEntries(products.map((p) => [p.variants[0].id, {
     product_title: p.title, vendor: p.vendor, url: p.url, image: p.featured_image.src,
@@ -152,7 +154,7 @@ async function renderSection(engine, type, id, data = {}) {
     const bSchema = (schema.blocks || []).find((x) => x.type === b.type) || {};
     return { id: bid, type: b.type, settings: { ...defaults(bSchema.settings), ...b.settings }, shopify_attributes: '' };
   });
-  const section = { id, settings: { ...defaults(schema.settings), ...data.settings }, blocks };
+  const section = { id, settings: { ...defaults(schema.settings), ...data.settings, ...SETTINGS_OVERRIDES[type] }, blocks };
   const html = await engine.renderFile(type, { section });
   return `<div id="shopify-section-${id}" class="shopify-section">${html}</div>`;
 }

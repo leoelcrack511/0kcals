@@ -3,6 +3,7 @@
 //    so the theme's own cart-drawer.js keeps working untouched
 //  - paints the cart-dependent pages (/cart, /pages/pedido) on the client
 //  - turns the contact forms into a local "¡RECIBIDO!" confirmation
+//  - demo mode: wa.me links show the prebuilt order message instead of opening WhatsApp
 (function () {
   var CFG = window.__0K || { base: '', variants: {} };
   var BASE = CFG.base || '';
@@ -154,6 +155,56 @@
         '<div style="font-size:14px;">Te respondemos en menos de 24h.</div></div>');
     }
     form.reset();
+  });
+
+  // ── WhatsApp (demo mode): show the prebuilt message instead of opening a chat ──
+  function showWhatsAppDemo(url) {
+    var text = '';
+    try { text = new URL(url).searchParams.get('text') || ''; } catch (e) {}
+    var prev = document.getElementById('0k-wa-demo');
+    if (prev) prev.remove();
+
+    var wrap = document.createElement('div');
+    wrap.id = '0k-wa-demo';
+    wrap.setAttribute('role', 'dialog');
+    wrap.setAttribute('aria-modal', 'true');
+    wrap.setAttribute('aria-label', 'Demo de portafolio');
+    wrap.style.cssText = 'position:fixed;inset:0;z-index:200;display:grid;place-items:center;padding:20px;' +
+      'background:rgba(10,20,17,0.6);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);';
+    wrap.innerHTML =
+      '<div style="background:var(--bone);color:var(--ink);border-radius:24px;padding:28px;width:100%;max-width:460px;max-height:calc(100vh - 40px);overflow:auto;">' +
+        '<div class="eyebrow" style="margin-bottom:12px;">// DEMO DE PORTAFOLIO</div>' +
+        '<div class="display" style="font-size:clamp(28px,7vw,40px);line-height:0.9;margin-bottom:14px;">ESTO IRÍA<br><span style="color:var(--green-900);">POR WHATSAPP.</span></div>' +
+        '<p style="font-size:14px;line-height:1.55;opacity:0.7;margin:0 0 18px;">En la tienda real, este botón abre WhatsApp con el pedido ya armado. Este es el mensaje que se enviaría:</p>' +
+        '<pre style="white-space:pre-wrap;font-family:\'JetBrains Mono\',monospace;font-size:12px;line-height:1.6;background:var(--ink);color:var(--mint-200);border-radius:14px;padding:16px;margin:0 0 20px;">' + esc(text) + '</pre>' +
+        '<button type="button" data-0k-wa-close class="btn btn--mint btn--lg" style="width:100%;justify-content:center;">Entendido</button>' +
+      '</div>';
+    document.body.appendChild(wrap);
+    document.body.style.overflow = 'hidden';
+
+    function close() {
+      wrap.remove();
+      document.body.style.overflow = '';
+      document.removeEventListener('keydown', onKey);
+    }
+    function onKey(e) { if (e.key === 'Escape') close(); }
+    wrap.addEventListener('click', function (e) {
+      if (e.target === wrap || e.target.closest('[data-0k-wa-close]')) close();
+    });
+    document.addEventListener('keydown', onKey);
+    wrap.querySelector('[data-0k-wa-close]').focus();
+  }
+
+  var realOpen = window.open;
+  window.open = function (url) {
+    if (typeof url === 'string' && url.indexOf('https://wa.me/') === 0) { showWhatsAppDemo(url); return null; }
+    return realOpen.apply(window, arguments);
+  };
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest && e.target.closest('a[href^="https://wa.me/"]');
+    if (!a) return;
+    e.preventDefault();
+    showWhatsAppDemo(a.href);
   });
 
   document.addEventListener('0k:cart', function () { syncCartPage(); renderPedido(); });
