@@ -1,0 +1,1189 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="theme-color" content="#003d22">
+
+  <title>Drop 002 — 0KCALS</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet"><link href="/0kcals/assets/base.css" rel="stylesheet" type="text/css" media="all" /></head>
+
+<body class="shell template-page-drop002">
+  <div id="scroll-progress"></div>
+  <div id="cursor-dot"></div>
+  <div class="grain" aria-hidden="true"></div>
+
+  <svg aria-hidden="true" focusable="false" style="position:absolute;width:0;height:0;overflow:hidden;pointer-events:none;">
+    <defs>
+      <!--
+        Lens displacement map:
+          R channel = horizontal gradient (black left → white right)
+          G channel = vertical gradient   (black top  → white bottom)
+        feDisplacementMap uses R for X and G for Y.
+        With scale=60 this creates ~10% uniform magnification at the pill edges —
+        content behind appears enlarged, like a flat convex glass lens.
+        Falls back gracefully: Safari sees only blur (no SVG in backdrop-filter).
+      -->
+      <filter id="pill-lens" x="-44%" y="-90%" width="188%" height="280%" color-interpolation-filters="sRGB">
+        <!-- Horizontal ramp: black(left) → white(right) -->
+        <feImage result="h-map" preserveAspectRatio="none"
+          href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='2' height='1'%3E%3ClinearGradient id='g'%3E%3Cstop offset='0' stop-color='black'/%3E%3Cstop offset='1' stop-color='white'/%3E%3C/linearGradient%3E%3Crect width='2' height='1' fill='url(%23g)'/%3E%3C/svg%3E"/>
+        <!-- Vertical ramp: black(top) → white(bottom) -->
+        <feImage result="v-map" preserveAspectRatio="none"
+          href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1' height='2'%3E%3ClinearGradient id='g' x1='0' x2='0' y1='0' y2='1'%3E%3Cstop offset='0' stop-color='black'/%3E%3Cstop offset='1' stop-color='white'/%3E%3C/linearGradient%3E%3Crect width='1' height='2' fill='url(%23g)'/%3E%3C/svg%3E"/>
+        <!-- Extract R channel from h-map -->
+        <feColorMatrix in="h-map" type="matrix"
+          values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0 1"
+          result="r-ch"/>
+        <!-- Move R from v-map into G channel -->
+        <feColorMatrix in="v-map" type="matrix"
+          values="0 0 0 0 0  1 0 0 0 0  0 0 0 0 0  0 0 0 0 1"
+          result="g-ch"/>
+        <!-- Merge: R = horizontal, G = vertical -->
+        <feBlend in="r-ch" in2="g-ch" mode="screen" result="lens-map"/>
+        <!-- Apply lens displacement (~10% magnification) -->
+        <feDisplacementMap in="SourceGraphic" in2="lens-map" scale="60"
+          xChannelSelector="R" yChannelSelector="G" result="magnified"/>
+        <!-- Slight glass softness -->
+        <feGaussianBlur in="magnified" stdDeviation="0.4"/>
+      </filter>
+    </defs>
+  </svg>
+
+  <div id="shopify-section-header" class="shopify-section">
+<header id="site-header">
+  <div id="header-inner">
+
+    <a href="/0kcals/" aria-label="0KCALS"><svg xmlns="http://www.w3.org/2000/svg"
+       viewBox="0 0 800 200"
+       width="160" height="40"
+       fill="none"
+       aria-label="0KCALS"
+       style="display:block;flex-shrink:0;">
+    <ellipse cx="90" cy="100" rx="62" ry="82"
+             stroke="currentColor" stroke-width="9" fill="none"/>
+    <text x="185" y="138"
+          fill="currentColor"
+          font-family="'Archivo Black', Impact, sans-serif"
+          font-size="130"
+          letter-spacing="-3">0KCALS</text>
+  </svg></a>
+
+    <nav class="header-nav" aria-label="Principal">
+      <a href="/0kcals/" class="nav-link" >Inicio</a>
+      <a href="/0kcals/pages/zerup" class="nav-link" >¿Qué son los Zerups?</a>
+      <a href="/0kcals/collections/all" class="nav-link" >Productos</a>
+      <a href="/0kcals/pages/nosotros" class="nav-link" >Nosotros</a>
+      <a href="/0kcals/pages/contacto" class="nav-link" >Contacto</a>
+    </nav>
+
+    <div style="display:flex;gap:12px;align-items:center;">
+      <a href="/0kcals/collections/all" class="btn btn--sm header-cta-desktop">Comprar</a>
+      <button id="cart-open-btn" aria-label="Abrir carrito" style="position:relative;width:44px;height:44px;border-radius:999px;border:1.5px solid rgba(0,0,0,0.12);background:transparent;color:inherit;display:grid;place-items:center;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M5 7h14l-1.5 13.5a2 2 0 0 1-2 1.5h-7a2 2 0 0 1-2-1.5z"/>
+          <path d="M9 7V5a3 3 0 0 1 6 0v2"/>
+        </svg><span class="badge" id="cart-count" style="display:none;">0</span></button>
+      <button id="menu-toggle" aria-label="Abrir menú" aria-expanded="false" style="display:none;width:44px;height:44px;border-radius:999px;border:1.5px solid rgba(0,0,0,0.12);background:transparent;color:inherit;align-items:center;justify-content:center;cursor:pointer;">
+        <svg id="menu-icon-open" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+        <svg id="menu-icon-close" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="display:none;">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+
+  </div>
+</header>
+
+<div id="header-pill">
+  <a href="/0kcals/" aria-label="0KCALS"><svg xmlns="http://www.w3.org/2000/svg"
+       viewBox="0 0 800 200"
+       width="160" height="40"
+       fill="none"
+       aria-label="0KCALS"
+       style="display:block;flex-shrink:0;">
+    <ellipse cx="90" cy="100" rx="62" ry="82"
+             stroke="currentColor" stroke-width="9" fill="none"/>
+    <text x="185" y="138"
+          fill="currentColor"
+          font-family="'Archivo Black', Impact, sans-serif"
+          font-size="130"
+          letter-spacing="-3">0KCALS</text>
+  </svg></a>
+  <nav class="pill-nav" aria-label="Principal">
+    <a href="/0kcals/" class="nav-link">Inicio</a>
+    <a href="/0kcals/pages/zerup" class="nav-link">¿Qué son los Zerups?</a>
+    <a href="/0kcals/collections/all" class="nav-link">Productos</a>
+    <a href="/0kcals/pages/nosotros" class="nav-link">Nosotros</a>
+    <a href="/0kcals/pages/contacto" class="nav-link">Contacto</a>
+  </nav>
+  <button id="pill-cart-btn" class="pill-cart-btn" aria-label="Abrir carrito" style="position:relative;width:36px;height:36px;border-radius:999px;border:1.5px solid rgba(0,0,0,0.12);background:transparent;color:inherit;display:grid;place-items:center;flex-shrink:0;cursor:pointer;">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M5 7h14l-1.5 13.5a2 2 0 0 1-2 1.5h-7a2 2 0 0 1-2-1.5z"/>
+      <path d="M9 7V5a3 3 0 0 1 6 0v2"/>
+    </svg>
+    <span class="badge" id="pill-cart-count" style="display:none;">0</span>
+  </button>
+  <button id="pill-menu-btn" class="pill-menu-btn" aria-label="Menú" style="width:36px;height:36px;border-radius:999px;border:1.5px solid rgba(0,0,0,0.12);background:transparent;color:inherit;display:none;place-items:center;flex-shrink:0;cursor:pointer;">
+    <svg class="pill-icon-open" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+      <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+    </svg>
+    <svg class="pill-icon-close" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="display:none;" aria-hidden="true">
+      <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+    </svg>
+  </button>
+</div>
+
+<div id="mobile-menu" style="display:none;position:fixed;inset:0;z-index:60;background:var(--bone);flex-direction:column;">
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:0 24px;height:var(--nav-height);flex-shrink:0;border-bottom:1px solid rgba(0,0,0,0.06);">
+    <a href="/0kcals/" aria-label="0KCALS"><svg xmlns="http://www.w3.org/2000/svg"
+       viewBox="0 0 800 200"
+       width="160" height="40"
+       fill="none"
+       aria-label="0KCALS"
+       style="display:block;flex-shrink:0;">
+    <ellipse cx="90" cy="100" rx="62" ry="82"
+             stroke="currentColor" stroke-width="9" fill="none"/>
+    <text x="185" y="138"
+          fill="currentColor"
+          font-family="'Archivo Black', Impact, sans-serif"
+          font-size="130"
+          letter-spacing="-3">0KCALS</text>
+  </svg></a>
+    <button id="mobile-menu-close" aria-label="Cerrar menú" style="width:36px;height:36px;border-radius:999px;border:1.5px solid rgba(0,0,0,0.12);background:transparent;color:inherit;display:grid;place-items:center;cursor:pointer;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+      </svg>
+    </button>
+  </div>
+  <div style="padding:32px 24px;display:flex;flex-direction:column;gap:8px;flex:1;">
+    <a href="/0kcals/" class="display" style="font-size:clamp(32px,10vw,48px);line-height:1;padding:12px 0;border-bottom:1px solid rgba(0,0,0,0.08);">INICIO</a>
+    <a href="/0kcals/pages/zerup" class="display" style="font-size:clamp(32px,10vw,48px);line-height:1;padding:12px 0;border-bottom:1px solid rgba(0,0,0,0.08);">¿QUÉ SON LOS ZERUPS?</a>
+    <a href="/0kcals/collections/all" class="display" style="font-size:clamp(32px,10vw,48px);line-height:1;padding:12px 0;border-bottom:1px solid rgba(0,0,0,0.08);">PRODUCTOS</a>
+    <a href="/0kcals/pages/nosotros" class="display" style="font-size:clamp(32px,10vw,48px);line-height:1;padding:12px 0;border-bottom:1px solid rgba(0,0,0,0.08);">NOSOTROS</a>
+    <a href="/0kcals/pages/contacto" class="display" style="font-size:clamp(32px,10vw,48px);line-height:1;padding:12px 0;border-bottom:1px solid rgba(0,0,0,0.08);">CONTACTO</a>
+    <a href="/0kcals/collections/all" class="btn btn--mint btn--lg" style="margin-top:32px;justify-content:center;">Comprar →</a>
+    <a href="/0kcals/pages/drop002" class="display mob-drop-link">
+      <span class="eyebrow mob-drop-eye">★ DROP 002</span>
+      PREORDENA
+    </a>
+  </div>
+</div>
+
+<style>
+/* ── DROP BAR ── */
+.drop-bar {
+  background: var(--yellow);
+  text-align: center;
+  padding: 9px 16px;
+  box-shadow:
+    0 0 12px rgba(255,229,102,0.45),
+    0 0 36px rgba(255,200,50,0.25),
+    0 0 70px rgba(255,175,20,0.12);
+  animation: hero-cta-twinkle 5s ease-in-out infinite;
+  position: relative;
+  z-index: 51;
+}
+.drop-bar-link {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--green-900);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.drop-bar-link:hover { opacity: 0.75; }
+
+/* ── MOBILE DROP 002 ENTRY ── */
+.mob-drop-link {
+  font-size: clamp(32px,10vw,48px);
+  line-height: 1;
+  padding: 16px 24px;
+  margin: 16px -24px -32px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: var(--yellow);
+  color: var(--green-900);
+  text-decoration: none;
+  box-shadow:
+    0 0 0 1px rgba(255,229,102,0.3),
+    0 0 12px rgba(255,229,102,0.45),
+    0 0 36px rgba(255,200,50,0.25),
+    0 0 70px rgba(255,175,20,0.12);
+  animation: hero-cta-twinkle 5s ease-in-out infinite;
+}
+.mob-drop-eye {
+  color: var(--green-900);
+  opacity: 0.55;
+  font-size: 10px;
+}
+
+.header-nav { display: flex; gap: 36px; align-items: center; }
+@media (max-width: 768px) {
+  .header-nav { display: none; }
+  .header-cta-desktop { display: none !important; }
+  #menu-toggle { display: flex !important; }
+}
+</style>
+
+<script>
+(function(){
+  var toggle = document.getElementById('menu-toggle');
+  var menu = document.getElementById('mobile-menu');
+  var closeBtn = document.getElementById('mobile-menu-close');
+  var iconOpen = document.getElementById('menu-icon-open');
+  var iconClose = document.getElementById('menu-icon-close');
+  var pillMenuBtn = document.getElementById('pill-menu-btn');
+  var pillIconOpen = pillMenuBtn ? pillMenuBtn.querySelector('.pill-icon-open') : null;
+  var pillIconClose = pillMenuBtn ? pillMenuBtn.querySelector('.pill-icon-close') : null;
+  var pill = document.getElementById('header-pill');
+  var open = false;
+
+  function setMenuState(isOpen) {
+    open = isOpen;
+    menu.style.display = open ? 'flex' : 'none';
+    iconOpen.style.display = open ? 'none' : 'block';
+    iconClose.style.display = open ? 'block' : 'none';
+    toggle.setAttribute('aria-expanded', open);
+    document.body.style.overflow = open ? 'hidden' : '';
+    if (pillIconOpen) pillIconOpen.style.display = open ? 'none' : 'block';
+    if (pillIconClose) pillIconClose.style.display = open ? 'block' : 'none';
+    if (pill) { pill.style.opacity = open ? '0' : ''; pill.style.pointerEvents = open ? 'none' : ''; }
+  }
+
+  toggle.addEventListener('click', function() { setMenuState(!open); });
+  if (closeBtn) closeBtn.addEventListener('click', function() { setMenuState(false); });
+  if (pillMenuBtn) pillMenuBtn.addEventListener('click', function() { setMenuState(!open); });
+
+  menu.querySelectorAll('a').forEach(function(link) {
+    link.addEventListener('click', function() { setMenuState(false); });
+  });
+
+  // Pill cart button → open drawer + sync badge
+  var pillCartBtn = document.getElementById('pill-cart-btn');
+  var pillCartCount = document.getElementById('pill-cart-count');
+  var mainCartCount = document.getElementById('cart-count');
+  if (pillCartBtn) {
+    pillCartBtn.addEventListener('click', function() {
+      document.getElementById('cart-open-btn').click();
+    });
+  }
+  if (mainCartCount && pillCartCount) {
+    new MutationObserver(function() {
+      pillCartCount.textContent = mainCartCount.textContent;
+      pillCartCount.style.display = mainCartCount.style.display;
+    }).observe(mainCartCount, { childList: true, attributes: true, attributeFilter: ['style'] });
+  }
+})();
+</script>
+
+
+</div>
+
+  <div id="shopify-section-cart-drawer" class="shopify-section"><div id="cart-overlay" class="cart-overlay" aria-hidden="true"></div>
+
+<aside id="cart-drawer" class="cart-drawer" aria-label="Tu bolsa" role="dialog" aria-modal="true" aria-hidden="true">
+  <div id="cart-drawer-inner" style="display:flex;flex-direction:column;height:100%;">
+
+    <div style="padding:24px 28px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(0,0,0,0.08);">
+      <div class="display" style="font-size:28px;">TU BOLSA</div>
+      <button id="cart-close-btn" aria-label="Cerrar" style="width:36px;height:36px;border-radius:999px;border:1.5px solid rgba(0,0,0,0.12);background:transparent;cursor:pointer;font-size:16px;font-weight:700;">✕</button>
+    </div><div style="flex:1;display:grid;place-items:center;padding:32px;text-align:center;">
+        <div>
+          <div class="display" style="font-size:48px;margin-bottom:12px;">VACÍA</div>
+          <p style="opacity:0.6;margin-bottom:20px;">Aún no agregaste nada.<br>Y eso, sí cuesta calorías.</p>
+          <a href="/0kcals/collections/all" class="btn btn--mint">Ver productos →</a>
+        </div>
+      </div></div>
+</aside>
+
+
+</div>
+
+  <main id="main-content" tabindex="-1">
+    <div id="shopify-section-main" class="shopify-section"><div class="d2-page">
+
+  <!-- ══════════════════════════════════════
+       HERO
+  ═══════════════════════════════════════ -->
+  <section class="d2-hero" data-section="d2-hero">
+
+    <!-- Spotlight vivo — sigue el cursor via parallax -->
+    <div class="d2-beam d2-beam--core" data-parallax-blob aria-hidden="true"></div>
+    <div class="d2-beam d2-beam--halo" data-parallax-blob aria-hidden="true"></div>
+
+    <div class="d2-hero-inner">
+      <div class="d2-eyebrow">
+        PRÓXIMOS LANZAMIENTOS&nbsp;·&nbsp;JUNIO 2026
+      </div>
+
+      <h1 class="d2-headline">
+        <span class="d2-headline-drop" data-anim="hero-line">DROP</span>
+        <span class="d2-headline-num"  data-anim="hero-line">002</span>
+      </h1>
+
+      <div class="d2-drop-location eyebrow">JUNIO 2026&nbsp;·&nbsp;LIMA&nbsp;·&nbsp;AREQUIPA</div>
+
+      <a href="#d2-selector" class="d2-scroll-cta">
+        Elige tus productos
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+          <path d="M12 5v14M5 12l7 7 7-7"/>
+        </svg>
+      </a>
+    </div>
+
+    <!-- Ghost numeral de fondo -->
+    <div class="d2-ghost" aria-hidden="true">002</div>
+
+  </section>
+
+
+  <!-- ══════════════════════════════════════
+       SELECTOR
+  ═══════════════════════════════════════ -->
+  <section class="d2-selector" id="d2-selector">
+    <div class="container">
+
+      <!-- Header -->
+      <div class="d2-sel-header">
+        <div class="eyebrow" style="color:var(--mint-500);margin-bottom:14px;">// ELIGE TU DROP 002</div>
+        <h2 class="d2-sel-title">¿QUÉ VA<br>EN TU CAJA?</h2>
+        <p class="d2-sel-sub">
+          Selecciona los productos que quieres reservar.
+          Te contactamos para coordinar el pago — despacho en JUNIO 2026.
+        </p>
+      </div>
+
+      <!-- Grid de productos -->
+      <div class="d2-grid" id="d2-grid"><div class="d2-mood-header" >
+              <div class="d2-mood-name">Starbucks Mood</div><div class="d2-mood-tagline eyebrow">// SABORES DE CAFETERÍA</div></div><button
+              class="d2-card"
+              data-id="2"
+              data-name="Amaretto"
+              data-price="45"
+              data-brand="MORE"aria-pressed="false"
+              aria-label="Seleccionar Amaretto"
+            >
+              <!-- Imagen -->
+              <div class="d2-card-img"><img src="/0kcals/assets/d2-starbucks-amaretto.webp" alt="Amaretto" class="d2-card-photo" loading="lazy"><!-- Checkmark overlay -->
+                <div class="d2-card-check" aria-hidden="true">
+                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                    <path d="M3 8l3.5 3.5L13 4.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </div></div>
+
+              <!-- Info -->
+              <div class="d2-card-body"><div class="d2-card-brand">MORE</div><div class="d2-card-name">Amaretto</div><div class="d2-card-desc">Zero azúcar · Importado</div><div class="d2-card-footer">
+                  <div class="d2-card-price">S/.45</div><div class="d2-card-tag d2-card-tag--add">+ Agregar</div>
+                    <div class="d2-card-tag d2-card-tag--added">✓ En tu pre-orden</div></div>
+              </div>
+            </button><button
+              class="d2-card"
+              data-id="3"
+              data-name="Chai"
+              data-price="45"
+              data-brand="MORE"aria-pressed="false"
+              aria-label="Seleccionar Chai"
+            >
+              <!-- Imagen -->
+              <div class="d2-card-img"><img src="/0kcals/assets/d2-starbucks-chai.webp" alt="Chai" class="d2-card-photo" loading="lazy"><!-- Checkmark overlay -->
+                <div class="d2-card-check" aria-hidden="true">
+                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                    <path d="M3 8l3.5 3.5L13 4.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </div></div>
+
+              <!-- Info -->
+              <div class="d2-card-body"><div class="d2-card-brand">MORE</div><div class="d2-card-name">Chai</div><div class="d2-card-desc">Zero azúcar · Importado</div><div class="d2-card-footer">
+                  <div class="d2-card-price">S/.45</div><div class="d2-card-tag d2-card-tag--add">+ Agregar</div>
+                    <div class="d2-card-tag d2-card-tag--added">✓ En tu pre-orden</div></div>
+              </div>
+            </button><button
+              class="d2-card"
+              data-id="4"
+              data-name="Dark Cacao"
+              data-price="45"
+              data-brand="MORE"aria-pressed="false"
+              aria-label="Seleccionar Dark Cacao"
+            >
+              <!-- Imagen -->
+              <div class="d2-card-img"><img src="/0kcals/assets/d2-starbucks-dark-cacao.webp" alt="Dark Cacao" class="d2-card-photo" loading="lazy"><!-- Checkmark overlay -->
+                <div class="d2-card-check" aria-hidden="true">
+                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                    <path d="M3 8l3.5 3.5L13 4.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </div></div>
+
+              <!-- Info -->
+              <div class="d2-card-body"><div class="d2-card-brand">MORE</div><div class="d2-card-name">Dark Cacao</div><div class="d2-card-desc">Zero azúcar · Importado</div><div class="d2-card-footer">
+                  <div class="d2-card-price">S/.45</div><div class="d2-card-tag d2-card-tag--add">+ Agregar</div>
+                    <div class="d2-card-tag d2-card-tag--added">✓ En tu pre-orden</div></div>
+              </div>
+            </button><button
+              class="d2-card"
+              data-id="5"
+              data-name="Maple Pecan"
+              data-price="45"
+              data-brand="MORE"aria-pressed="false"
+              aria-label="Seleccionar Maple Pecan"
+            >
+              <!-- Imagen -->
+              <div class="d2-card-img"><img src="/0kcals/assets/d2-starbucks-maple-pecan.webp" alt="Maple Pecan" class="d2-card-photo" loading="lazy"><!-- Checkmark overlay -->
+                <div class="d2-card-check" aria-hidden="true">
+                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                    <path d="M3 8l3.5 3.5L13 4.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </div></div>
+
+              <!-- Info -->
+              <div class="d2-card-body"><div class="d2-card-brand">MORE</div><div class="d2-card-name">Maple Pecan</div><div class="d2-card-desc">Zero azúcar · Importado</div><div class="d2-card-footer">
+                  <div class="d2-card-price">S/.45</div><div class="d2-card-tag d2-card-tag--add">+ Agregar</div>
+                    <div class="d2-card-tag d2-card-tag--added">✓ En tu pre-orden</div></div>
+              </div>
+            </button><button
+              class="d2-card"
+              data-id="6"
+              data-name="Cinnamon"
+              data-price="45"
+              data-brand="MORE"aria-pressed="false"
+              aria-label="Seleccionar Cinnamon"
+            >
+              <!-- Imagen -->
+              <div class="d2-card-img"><img src="/0kcals/assets/d2-starbucks-cinnamon.webp" alt="Cinnamon" class="d2-card-photo" loading="lazy"><!-- Checkmark overlay -->
+                <div class="d2-card-check" aria-hidden="true">
+                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                    <path d="M3 8l3.5 3.5L13 4.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </div></div>
+
+              <!-- Info -->
+              <div class="d2-card-body"><div class="d2-card-brand">MORE</div><div class="d2-card-name">Cinnamon</div><div class="d2-card-desc">Zero azúcar · Importado</div><div class="d2-card-footer">
+                  <div class="d2-card-price">S/.45</div><div class="d2-card-tag d2-card-tag--add">+ Agregar</div>
+                    <div class="d2-card-tag d2-card-tag--added">✓ En tu pre-orden</div></div>
+              </div>
+            </button><button
+              class="d2-card"
+              data-id="7"
+              data-name="Salted Caramel"
+              data-price="45"
+              data-brand="MORE"aria-pressed="false"
+              aria-label="Seleccionar Salted Caramel"
+            >
+              <!-- Imagen -->
+              <div class="d2-card-img"><img src="/0kcals/assets/d2-starbucks-salted-caramel.webp" alt="Salted Caramel" class="d2-card-photo" loading="lazy"><!-- Checkmark overlay -->
+                <div class="d2-card-check" aria-hidden="true">
+                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                    <path d="M3 8l3.5 3.5L13 4.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </div></div>
+
+              <!-- Info -->
+              <div class="d2-card-body"><div class="d2-card-brand">MORE</div><div class="d2-card-name">Salted Caramel</div><div class="d2-card-desc">Zero azúcar · Importado</div><div class="d2-card-footer">
+                  <div class="d2-card-price">S/.45</div><div class="d2-card-tag d2-card-tag--add">+ Agregar</div>
+                    <div class="d2-card-tag d2-card-tag--added">✓ En tu pre-orden</div></div>
+              </div>
+            </button><button
+              class="d2-card d2-card--sold"
+              data-id="8"
+              data-name="Macadamia"
+              data-price="45"
+              data-brand="MORE"disabled
+              aria-disabled="true"
+              aria-label="Macadamia — Agotado"
+            >
+              <!-- Imagen -->
+              <div class="d2-card-img"><img src="/0kcals/assets/d2-starbucks-macadamia.webp" alt="Macadamia" class="d2-card-photo" loading="lazy"><!-- Checkmark overlay -->
+                <div class="d2-card-check" aria-hidden="true">
+                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                    <path d="M3 8l3.5 3.5L13 4.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </div><div class="d2-sold-stamp" aria-hidden="true">AGOTADO</div></div>
+
+              <!-- Info -->
+              <div class="d2-card-body"><div class="d2-card-brand">MORE</div><div class="d2-card-name">Macadamia</div><div class="d2-card-desc">Zero azúcar · Importado</div><div class="d2-card-footer">
+                  <div class="d2-card-price">S/.45</div><div class="d2-card-tag d2-card-tag--sold-out">AGOTADO</div></div>
+              </div>
+            </button><button
+              class="d2-card"
+              data-id="9"
+              data-name="Azúcar Blanca"
+              data-price="45"
+              data-brand="MORE"aria-pressed="false"
+              aria-label="Seleccionar Azúcar Blanca"
+            >
+              <!-- Imagen -->
+              <div class="d2-card-img"><img src="/0kcals/assets/d2-starbucks-white-sugar.webp" alt="Azúcar Blanca" class="d2-card-photo" loading="lazy"><!-- Checkmark overlay -->
+                <div class="d2-card-check" aria-hidden="true">
+                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                    <path d="M3 8l3.5 3.5L13 4.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </div></div>
+
+              <!-- Info -->
+              <div class="d2-card-body"><div class="d2-card-brand">MORE</div><div class="d2-card-name">Azúcar Blanca</div><div class="d2-card-desc">Zero azúcar · Importado</div><div class="d2-card-footer">
+                  <div class="d2-card-price">S/.45</div><div class="d2-card-tag d2-card-tag--add">+ Agregar</div>
+                    <div class="d2-card-tag d2-card-tag--added">✓ En tu pre-orden</div></div>
+              </div>
+            </button><div class="d2-mood-header" >
+              <div class="d2-mood-name">Red Bull Mood</div><div class="d2-mood-tagline eyebrow">// ENERGÍA SIN CAÍDA</div></div><button
+              class="d2-card"
+              data-id="11"
+              data-name="Strawberry Pineapple"
+              data-price="45"
+              data-brand="MIO"aria-pressed="false"
+              aria-label="Seleccionar Strawberry Pineapple"
+            >
+              <!-- Imagen -->
+              <div class="d2-card-img"><img src="/0kcals/assets/d2-redbull-strawberry-pineapple.png" alt="Strawberry Pineapple" class="d2-card-photo" loading="lazy"><!-- Checkmark overlay -->
+                <div class="d2-card-check" aria-hidden="true">
+                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                    <path d="M3 8l3.5 3.5L13 4.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </div></div>
+
+              <!-- Info -->
+              <div class="d2-card-body"><div class="d2-card-brand">MIO</div><div class="d2-card-name">Strawberry Pineapple</div><div class="d2-card-desc">Zero azúcar · Importado</div><div class="d2-card-footer">
+                  <div class="d2-card-price">S/.45</div><div class="d2-card-tag d2-card-tag--add">+ Agregar</div>
+                    <div class="d2-card-tag d2-card-tag--added">✓ En tu pre-orden</div></div>
+              </div>
+            </button><button
+              class="d2-card"
+              data-id="12"
+              data-name="Blackberry Rush"
+              data-price="45"
+              data-brand="MIO"aria-pressed="false"
+              aria-label="Seleccionar Blackberry Rush"
+            >
+              <!-- Imagen -->
+              <div class="d2-card-img"><img src="/0kcals/assets/d2-redbull-blackberry-rush.png" alt="Blackberry Rush" class="d2-card-photo" loading="lazy"><!-- Checkmark overlay -->
+                <div class="d2-card-check" aria-hidden="true">
+                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                    <path d="M3 8l3.5 3.5L13 4.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </div></div>
+
+              <!-- Info -->
+              <div class="d2-card-body"><div class="d2-card-brand">MIO</div><div class="d2-card-name">Blackberry Rush</div><div class="d2-card-desc">Zero azúcar · Importado</div><div class="d2-card-footer">
+                  <div class="d2-card-price">S/.45</div><div class="d2-card-tag d2-card-tag--add">+ Agregar</div>
+                    <div class="d2-card-tag d2-card-tag--added">✓ En tu pre-orden</div></div>
+              </div>
+            </button><button
+              class="d2-card"
+              data-id="13"
+              data-name="Tropical Fusion"
+              data-price="45"
+              data-brand="MIO"aria-pressed="false"
+              aria-label="Seleccionar Tropical Fusion"
+            >
+              <!-- Imagen -->
+              <div class="d2-card-img"><img src="/0kcals/assets/d2-redbull-tropical-fusion.png" alt="Tropical Fusion" class="d2-card-photo" loading="lazy"><!-- Checkmark overlay -->
+                <div class="d2-card-check" aria-hidden="true">
+                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                    <path d="M3 8l3.5 3.5L13 4.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </div></div>
+
+              <!-- Info -->
+              <div class="d2-card-body"><div class="d2-card-brand">MIO</div><div class="d2-card-name">Tropical Fusion</div><div class="d2-card-desc">Zero azúcar · Importado</div><div class="d2-card-footer">
+                  <div class="d2-card-price">S/.45</div><div class="d2-card-tag d2-card-tag--add">+ Agregar</div>
+                    <div class="d2-card-tag d2-card-tag--added">✓ En tu pre-orden</div></div>
+              </div>
+            </button><button
+              class="d2-card"
+              data-id="14"
+              data-name="Berry Blast"
+              data-price="45"
+              data-brand="MIO"aria-pressed="false"
+              aria-label="Seleccionar Berry Blast"
+            >
+              <!-- Imagen -->
+              <div class="d2-card-img"><img src="/0kcals/assets/d2-redbull-berry-blast.jpg" alt="Berry Blast" class="d2-card-photo" loading="lazy"><!-- Checkmark overlay -->
+                <div class="d2-card-check" aria-hidden="true">
+                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                    <path d="M3 8l3.5 3.5L13 4.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </div></div>
+
+              <!-- Info -->
+              <div class="d2-card-body"><div class="d2-card-brand">MIO</div><div class="d2-card-name">Berry Blast</div><div class="d2-card-desc">Zero azúcar · Importado</div><div class="d2-card-footer">
+                  <div class="d2-card-price">S/.45</div><div class="d2-card-tag d2-card-tag--add">+ Agregar</div>
+                    <div class="d2-card-tag d2-card-tag--added">✓ En tu pre-orden</div></div>
+              </div>
+            </button><div class="d2-mood-header" >
+              <div class="d2-mood-name">Party Mood</div><div class="d2-mood-tagline eyebrow">// COCKTAILS SIN CULPA</div></div><button
+              class="d2-card"
+              data-id="16"
+              data-name="Aperol Cranberry"
+              data-price="45"
+              data-brand="MORE"aria-pressed="false"
+              aria-label="Seleccionar Aperol Cranberry"
+            >
+              <!-- Imagen -->
+              <div class="d2-card-img"><img src="/0kcals/assets/d2-party-aperol-cranberry.webp" alt="Aperol Cranberry" class="d2-card-photo" loading="lazy"><!-- Checkmark overlay -->
+                <div class="d2-card-check" aria-hidden="true">
+                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                    <path d="M3 8l3.5 3.5L13 4.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </div></div>
+
+              <!-- Info -->
+              <div class="d2-card-body"><div class="d2-card-brand">MORE</div><div class="d2-card-name">Aperol Cranberry</div><div class="d2-card-desc">Zero azúcar · Importado</div><div class="d2-card-footer">
+                  <div class="d2-card-price">S/.45</div><div class="d2-card-tag d2-card-tag--add">+ Agregar</div>
+                    <div class="d2-card-tag d2-card-tag--added">✓ En tu pre-orden</div></div>
+              </div>
+            </button><button
+              class="d2-card"
+              data-id="17"
+              data-name="Piña Colada"
+              data-price="45"
+              data-brand="MORE"aria-pressed="false"
+              aria-label="Seleccionar Piña Colada"
+            >
+              <!-- Imagen -->
+              <div class="d2-card-img"><img src="/0kcals/assets/d2-party-pina-colada.webp" alt="Piña Colada" class="d2-card-photo" loading="lazy"><!-- Checkmark overlay -->
+                <div class="d2-card-check" aria-hidden="true">
+                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                    <path d="M3 8l3.5 3.5L13 4.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </div></div>
+
+              <!-- Info -->
+              <div class="d2-card-body"><div class="d2-card-brand">MORE</div><div class="d2-card-name">Piña Colada</div><div class="d2-card-desc">Zero azúcar · Importado</div><div class="d2-card-footer">
+                  <div class="d2-card-price">S/.45</div><div class="d2-card-tag d2-card-tag--add">+ Agregar</div>
+                    <div class="d2-card-tag d2-card-tag--added">✓ En tu pre-orden</div></div>
+              </div>
+            </button><button
+              class="d2-card"
+              data-id="18"
+              data-name="Sweet Wine"
+              data-price="45"
+              data-brand="MORE"aria-pressed="false"
+              aria-label="Seleccionar Sweet Wine"
+            >
+              <!-- Imagen -->
+              <div class="d2-card-img"><img src="/0kcals/assets/d2-party-sweet-white.png" alt="Sweet Wine" class="d2-card-photo" loading="lazy"><!-- Checkmark overlay -->
+                <div class="d2-card-check" aria-hidden="true">
+                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                    <path d="M3 8l3.5 3.5L13 4.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </div></div>
+
+              <!-- Info -->
+              <div class="d2-card-body"><div class="d2-card-brand">MORE</div><div class="d2-card-name">Sweet Wine</div><div class="d2-card-desc">Zero azúcar · Importado</div><div class="d2-card-footer">
+                  <div class="d2-card-price">S/.45</div><div class="d2-card-tag d2-card-tag--add">+ Agregar</div>
+                    <div class="d2-card-tag d2-card-tag--added">✓ En tu pre-orden</div></div>
+              </div>
+            </button><button
+              class="d2-card"
+              data-id="19"
+              data-name="Aperol"
+              data-price="45"
+              data-brand="MORE"aria-pressed="false"
+              aria-label="Seleccionar Aperol"
+            >
+              <!-- Imagen -->
+              <div class="d2-card-img"><img src="/0kcals/assets/d2-party-aperol.webp" alt="Aperol" class="d2-card-photo" loading="lazy"><!-- Checkmark overlay -->
+                <div class="d2-card-check" aria-hidden="true">
+                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                    <path d="M3 8l3.5 3.5L13 4.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </div></div>
+
+              <!-- Info -->
+              <div class="d2-card-body"><div class="d2-card-brand">MORE</div><div class="d2-card-name">Aperol</div><div class="d2-card-desc">Zero azúcar · Importado</div><div class="d2-card-footer">
+                  <div class="d2-card-price">S/.45</div><div class="d2-card-tag d2-card-tag--add">+ Agregar</div>
+                    <div class="d2-card-tag d2-card-tag--added">✓ En tu pre-orden</div></div>
+              </div>
+            </button><button
+              class="d2-card"
+              data-id="20"
+              data-name="Mojito"
+              data-price="45"
+              data-brand="MORE"aria-pressed="false"
+              aria-label="Seleccionar Mojito"
+            >
+              <!-- Imagen -->
+              <div class="d2-card-img"><img src="/0kcals/assets/d2-party-mojito.avif" alt="Mojito" class="d2-card-photo" loading="lazy"><!-- Checkmark overlay -->
+                <div class="d2-card-check" aria-hidden="true">
+                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                    <path d="M3 8l3.5 3.5L13 4.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </div></div>
+
+              <!-- Info -->
+              <div class="d2-card-body"><div class="d2-card-brand">MORE</div><div class="d2-card-name">Mojito</div><div class="d2-card-desc">Zero azúcar · Importado</div><div class="d2-card-footer">
+                  <div class="d2-card-price">S/.45</div><div class="d2-card-tag d2-card-tag--add">+ Agregar</div>
+                    <div class="d2-card-tag d2-card-tag--added">✓ En tu pre-orden</div></div>
+              </div>
+            </button><div class="d2-mood-header" >
+              <div class="d2-mood-name">Daily Mood</div><div class="d2-mood-tagline eyebrow">// PARA EL DÍA A DÍA</div></div><button
+              class="d2-card"
+              data-id="22"
+              data-name="Orange Cola"
+              data-price="45"
+              data-brand="MORE"aria-pressed="false"
+              aria-label="Seleccionar Orange Cola"
+            >
+              <!-- Imagen -->
+              <div class="d2-card-img"><img src="/0kcals/assets/d2-daily-orange-cola.webp" alt="Orange Cola" class="d2-card-photo" loading="lazy"><!-- Checkmark overlay -->
+                <div class="d2-card-check" aria-hidden="true">
+                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                    <path d="M3 8l3.5 3.5L13 4.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </div></div>
+
+              <!-- Info -->
+              <div class="d2-card-body"><div class="d2-card-brand">MORE</div><div class="d2-card-name">Orange Cola</div><div class="d2-card-desc">Zero azúcar · Importado</div><div class="d2-card-footer">
+                  <div class="d2-card-price">S/.45</div><div class="d2-card-tag d2-card-tag--add">+ Agregar</div>
+                    <div class="d2-card-tag d2-card-tag--added">✓ En tu pre-orden</div></div>
+              </div>
+            </button><button
+              class="d2-card"
+              data-id="23"
+              data-name="Red Apple"
+              data-price="45"
+              data-brand="MORE"aria-pressed="false"
+              aria-label="Seleccionar Red Apple"
+            >
+              <!-- Imagen -->
+              <div class="d2-card-img"><img src="/0kcals/assets/d2-daily-red-apple.webp" alt="Red Apple" class="d2-card-photo" loading="lazy"><!-- Checkmark overlay -->
+                <div class="d2-card-check" aria-hidden="true">
+                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                    <path d="M3 8l3.5 3.5L13 4.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </div></div>
+
+              <!-- Info -->
+              <div class="d2-card-body"><div class="d2-card-brand">MORE</div><div class="d2-card-name">Red Apple</div><div class="d2-card-desc">Zero azúcar · Importado</div><div class="d2-card-footer">
+                  <div class="d2-card-price">S/.45</div><div class="d2-card-tag d2-card-tag--add">+ Agregar</div>
+                    <div class="d2-card-tag d2-card-tag--added">✓ En tu pre-orden</div></div>
+              </div>
+            </button><button
+              class="d2-card"
+              data-id="24"
+              data-name="Peach Honey"
+              data-price="45"
+              data-brand="MORE"aria-pressed="false"
+              aria-label="Seleccionar Peach Honey"
+            >
+              <!-- Imagen -->
+              <div class="d2-card-img"><img src="/0kcals/assets/d2-daily-peach-honey.webp" alt="Peach Honey" class="d2-card-photo" loading="lazy"><!-- Checkmark overlay -->
+                <div class="d2-card-check" aria-hidden="true">
+                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                    <path d="M3 8l3.5 3.5L13 4.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </div></div>
+
+              <!-- Info -->
+              <div class="d2-card-body"><div class="d2-card-brand">MORE</div><div class="d2-card-name">Peach Honey</div><div class="d2-card-desc">Zero azúcar · Importado</div><div class="d2-card-footer">
+                  <div class="d2-card-price">S/.45</div><div class="d2-card-tag d2-card-tag--add">+ Agregar</div>
+                    <div class="d2-card-tag d2-card-tag--added">✓ En tu pre-orden</div></div>
+              </div>
+            </button><button
+              class="d2-card"
+              data-id="25"
+              data-name="Cherry Cola"
+              data-price="45"
+              data-brand="MORE"aria-pressed="false"
+              aria-label="Seleccionar Cherry Cola"
+            >
+              <!-- Imagen -->
+              <div class="d2-card-img"><img src="/0kcals/assets/d2-daily-cherry-cola.webp" alt="Cherry Cola" class="d2-card-photo" loading="lazy"><!-- Checkmark overlay -->
+                <div class="d2-card-check" aria-hidden="true">
+                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                    <path d="M3 8l3.5 3.5L13 4.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </div></div>
+
+              <!-- Info -->
+              <div class="d2-card-body"><div class="d2-card-brand">MORE</div><div class="d2-card-name">Cherry Cola</div><div class="d2-card-desc">Zero azúcar · Importado</div><div class="d2-card-footer">
+                  <div class="d2-card-price">S/.45</div><div class="d2-card-tag d2-card-tag--add">+ Agregar</div>
+                    <div class="d2-card-tag d2-card-tag--added">✓ En tu pre-orden</div></div>
+              </div>
+            </button><button
+              class="d2-card"
+              data-id="26"
+              data-name="Multifruit"
+              data-price="45"
+              data-brand="MORE"aria-pressed="false"
+              aria-label="Seleccionar Multifruit"
+            >
+              <!-- Imagen -->
+              <div class="d2-card-img"><img src="/0kcals/assets/d2-daily-multifruit.webp" alt="Multifruit" class="d2-card-photo" loading="lazy"><!-- Checkmark overlay -->
+                <div class="d2-card-check" aria-hidden="true">
+                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                    <path d="M3 8l3.5 3.5L13 4.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </div></div>
+
+              <!-- Info -->
+              <div class="d2-card-body"><div class="d2-card-brand">MORE</div><div class="d2-card-name">Multifruit</div><div class="d2-card-desc">Zero azúcar · Importado</div><div class="d2-card-footer">
+                  <div class="d2-card-price">S/.45</div><div class="d2-card-tag d2-card-tag--add">+ Agregar</div>
+                    <div class="d2-card-tag d2-card-tag--added">✓ En tu pre-orden</div></div>
+              </div>
+            </button><button
+              class="d2-card"
+              data-id="27"
+              data-name="Orange"
+              data-price="45"
+              data-brand="MORE"aria-pressed="false"
+              aria-label="Seleccionar Orange"
+            >
+              <!-- Imagen -->
+              <div class="d2-card-img"><img src="/0kcals/assets/d2-daily-orange.webp" alt="Orange" class="d2-card-photo" loading="lazy"><!-- Checkmark overlay -->
+                <div class="d2-card-check" aria-hidden="true">
+                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                    <path d="M3 8l3.5 3.5L13 4.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </div></div>
+
+              <!-- Info -->
+              <div class="d2-card-body"><div class="d2-card-brand">MORE</div><div class="d2-card-name">Orange</div><div class="d2-card-desc">Zero azúcar · Importado</div><div class="d2-card-footer">
+                  <div class="d2-card-price">S/.45</div><div class="d2-card-tag d2-card-tag--add">+ Agregar</div>
+                    <div class="d2-card-tag d2-card-tag--added">✓ En tu pre-orden</div></div>
+              </div>
+            </button><button
+              class="d2-card"
+              data-id="28"
+              data-name="Pear"
+              data-price="45"
+              data-brand="MORE"aria-pressed="false"
+              aria-label="Seleccionar Pear"
+            >
+              <!-- Imagen -->
+              <div class="d2-card-img"><img src="/0kcals/assets/d2-daily-pear.webp" alt="Pear" class="d2-card-photo" loading="lazy"><!-- Checkmark overlay -->
+                <div class="d2-card-check" aria-hidden="true">
+                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                    <path d="M3 8l3.5 3.5L13 4.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </div></div>
+
+              <!-- Info -->
+              <div class="d2-card-body"><div class="d2-card-brand">MORE</div><div class="d2-card-name">Pear</div><div class="d2-card-desc">Zero azúcar · Importado</div><div class="d2-card-footer">
+                  <div class="d2-card-price">S/.45</div><div class="d2-card-tag d2-card-tag--add">+ Agregar</div>
+                    <div class="d2-card-tag d2-card-tag--added">✓ En tu pre-orden</div></div>
+              </div>
+            </button><button
+              class="d2-card"
+              data-id="29"
+              data-name="Pineapple"
+              data-price="45"
+              data-brand="MORE"aria-pressed="false"
+              aria-label="Seleccionar Pineapple"
+            >
+              <!-- Imagen -->
+              <div class="d2-card-img"><img src="/0kcals/assets/d2-daily-pineapple.webp" alt="Pineapple" class="d2-card-photo" loading="lazy"><!-- Checkmark overlay -->
+                <div class="d2-card-check" aria-hidden="true">
+                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                    <path d="M3 8l3.5 3.5L13 4.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </div></div>
+
+              <!-- Info -->
+              <div class="d2-card-body"><div class="d2-card-brand">MORE</div><div class="d2-card-name">Pineapple</div><div class="d2-card-desc">Zero azúcar · Importado</div><div class="d2-card-footer">
+                  <div class="d2-card-price">S/.45</div><div class="d2-card-tag d2-card-tag--add">+ Agregar</div>
+                    <div class="d2-card-tag d2-card-tag--added">✓ En tu pre-orden</div></div>
+              </div>
+            </button><button
+              class="d2-card"
+              data-id="30"
+              data-name="Lemon Iced Tea"
+              data-price="45"
+              data-brand="MORE"aria-pressed="false"
+              aria-label="Seleccionar Lemon Iced Tea"
+            >
+              <!-- Imagen -->
+              <div class="d2-card-img"><img src="/0kcals/assets/d2-daily-lemon-iced-tea.webp" alt="Lemon Iced Tea" class="d2-card-photo" loading="lazy"><!-- Checkmark overlay -->
+                <div class="d2-card-check" aria-hidden="true">
+                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                    <path d="M3 8l3.5 3.5L13 4.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </div></div>
+
+              <!-- Info -->
+              <div class="d2-card-body"><div class="d2-card-brand">MORE</div><div class="d2-card-name">Lemon Iced Tea</div><div class="d2-card-desc">Zero azúcar · Importado</div><div class="d2-card-footer">
+                  <div class="d2-card-price">S/.45</div><div class="d2-card-tag d2-card-tag--add">+ Agregar</div>
+                    <div class="d2-card-tag d2-card-tag--added">✓ En tu pre-orden</div></div>
+              </div>
+            </button></div>
+
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════════════════════
+       STICKY BAR (estilo prompt box)
+  ═══════════════════════════════════════ -->
+  <div class="d2-sticky" id="d2-sticky" aria-hidden="true">
+    <div class="d2-sticky-inner">
+
+      <!-- Izquierda: dots + info -->
+      <div class="d2-sticky-left">
+        <div class="d2-dots" id="d2-dots"></div>
+        <div class="d2-sticky-text">
+          <span class="d2-sticky-count" id="d2-count">0 productos</span>
+          <span class="d2-sticky-sep">·</span>
+          <span class="d2-sticky-total" id="d2-total">S/.0</span>
+        </div>
+      </div>
+
+      <!-- Derecha: botón WhatsApp -->
+      <button class="d2-wa-btn" id="d2-wa-btn" disabled>
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+        </svg>
+        PRE-ORDENAR
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+          <path d="M5 12h14M12 5l7 7-7 7"/>
+        </svg>
+      </button>
+
+    </div>
+  </div>
+
+</div>
+
+
+<!-- ══════════════════════════════════════
+     JS
+═══════════════════════════════════════ -->
+<script>
+(function () {
+
+  /* ── Click ripple lights ───────────────────────────────────────────── */
+  var hero = document.querySelector('.d2-hero');
+  if (hero) {
+    hero.addEventListener('click', function (e) {
+      var rect = hero.getBoundingClientRect();
+      var x = e.clientX - rect.left;
+      var y = e.clientY - rect.top;
+
+      /* Spawn 3 rings: core burst, mid halo, outer ring */
+      var layers = [
+        { size: 120,  blur: 16, alpha: 0.75, dur: 700  },
+        { size: 320,  blur: 40, alpha: 0.38, dur: 900  },
+        { size: 600,  blur: 72, alpha: 0.16, dur: 1100 }
+      ];
+
+      layers.forEach(function (l) {
+        var el = document.createElement('div');
+        el.style.cssText = [
+          'position:absolute',
+          'border-radius:50%',
+          'pointer-events:none',
+          'width:'  + l.size + 'px',
+          'height:' + l.size + 'px',
+          'left:'   + (x - l.size / 2) + 'px',
+          'top:'    + (y - l.size / 2) + 'px',
+          'background:radial-gradient(circle,rgba(57,255,158,' + l.alpha + ') 0%,rgba(57,255,158,0.04) 55%,transparent 72%)',
+          'filter:blur(' + l.blur + 'px)',
+          'z-index:3',
+          'transform:scale(0.15)',
+          'opacity:1',
+          'transition:transform ' + l.dur + 'ms cubic-bezier(0.22,1,0.36,1),opacity ' + l.dur + 'ms ease-out'
+        ].join(';');
+        hero.appendChild(el);
+
+        requestAnimationFrame(function () {
+          requestAnimationFrame(function () {
+            el.style.transform = 'scale(1)';
+            el.style.opacity   = '0';
+          });
+        });
+
+        setTimeout(function () { el.remove(); }, l.dur + 50);
+      });
+    });
+  }
+
+})();
+</script>
+
+<script>
+(function () {
+  var WA  = '0';
+
+  /* ── Selección ─────────────────────────────── */
+  var selected = {};
+
+  var sticky   = document.getElementById('d2-sticky');
+  var countEl  = document.getElementById('d2-count');
+  var totalEl  = document.getElementById('d2-total');
+  var dotsEl   = document.getElementById('d2-dots');
+  var waBtn    = document.getElementById('d2-wa-btn');
+
+  function renderBar() {
+    var ids   = Object.keys(selected);
+    var n     = ids.length;
+    var total = ids.reduce(function (s, k) { return s + parseFloat(selected[k].price); }, 0);
+
+    countEl.textContent = n === 1 ? '1 producto' : n + ' productos';
+    totalEl.textContent = 'S/.' + total.toFixed(0);
+
+    dotsEl.innerHTML = '';
+    ids.forEach(function () {
+      var dot = document.createElement('span');
+      dot.className = 'd2-dot';
+      dotsEl.appendChild(dot);
+    });
+
+    var visible = n > 0;
+    sticky.classList.toggle('d2-sticky--on', visible);
+    sticky.setAttribute('aria-hidden', visible ? 'false' : 'true');
+    waBtn.disabled = !visible;
+  }
+
+  document.querySelectorAll('.d2-card:not(.d2-card--sold)').forEach(function (card) {
+    card.addEventListener('click', function () {
+      var id = this.dataset.id;
+      if (selected[id]) {
+        delete selected[id];
+        this.classList.remove('d2-card--on');
+        this.setAttribute('aria-pressed', 'false');
+      } else {
+        selected[id] = {
+          name:  this.dataset.name,
+          price: this.dataset.price,
+          brand: this.dataset.brand
+        };
+        this.classList.add('d2-card--on');
+        this.setAttribute('aria-pressed', 'true');
+      }
+      renderBar();
+    });
+  });
+
+  /* ── WhatsApp ──────────────────────────────── */
+  waBtn.addEventListener('click', function () {
+    var ids   = Object.keys(selected);
+    if (!ids.length) return;
+    var total = ids.reduce(function (s, k) { return s + parseFloat(selected[k].price); }, 0);
+
+    var lineas = ids.map(function (k) {
+      var p = selected[k];
+      return '• ' + (p.brand ? p.brand + ' · ' : '') + p.name + ' — S/.' + parseFloat(p.price).toFixed(0);
+    }).join('\n');
+
+    var msg =
+      '🔥 *PRE-ORDEN DROP 002 — 0KCALS*\n\n' +
+      'Hola! Quiero reservar estos productos:\n\n' +
+      lineas + '\n\n' +
+      '━━━━━━━━━━━━━━━━\n' +
+      'Total estimado: S/.' + total.toFixed(0) + '\n\n' +
+      '¿Cómo coordino el pago? 🌿';
+
+    window.open(
+      'https://wa.me/' + WA + '?text=' + encodeURIComponent(msg),
+      '_blank',
+      'noopener,noreferrer'
+    );
+  });
+
+  /* ── Smooth scroll para el CTA del hero ───── */
+  var scrollCta = document.querySelector('.d2-scroll-cta');
+  if (scrollCta) {
+    scrollCta.addEventListener('click', function (e) {
+      e.preventDefault();
+      var target = document.getElementById('d2-selector');
+      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  }
+})();
+</script>
+
+
+
+</div>
+  </main>
+
+  <div id="shopify-section-footer" class="shopify-section"><footer style="color:var(--mint-200);padding:80px 0 32px;margin-top:auto;position:relative;">
+  <div data-parallax-bg style="position:absolute;inset:-4%;background:var(--green-900);pointer-events:none;"></div>
+  <div data-parallax-blob style="position:absolute;right:-120px;top:-100px;width:420px;height:420px;border-radius:50%;background:var(--mint-500);filter:blur(80px);opacity:0.18;pointer-events:none;"></div>
+
+  <div class="container" style="position:relative;">
+
+    <div class="display" style="font-size:clamp(56px,12vw,180px);line-height:0.85;margin-bottom:48px;">
+      0 KCALS<br>
+      <span style="color:var(--mint-500)">MAX VIBE.</span>
+    </div>
+
+    <div class="footer-grid">
+
+      <div><svg xmlns="http://www.w3.org/2000/svg"
+       viewBox="0 0 800 200"
+       width="160" height="40"
+       fill="none"
+       aria-label="0KCALS"
+       style="display:block;flex-shrink:0;">
+    <ellipse cx="90" cy="100" rx="62" ry="82"
+             stroke="currentColor" stroke-width="9" fill="none"/>
+    <text x="185" y="138"
+          fill="currentColor"
+          font-family="'Archivo Black', Impact, sans-serif"
+          font-size="130"
+          letter-spacing="-3">0KCALS</text>
+  </svg><p style="margin-top:16px;font-size:14px;opacity:0.7;max-width:320px;line-height:1.5;">
+          Marketplace peruano de productos premium para una vida más alta. Importamos lo mejor del mundo.
+        </p>
+      </div>
+
+      <div>
+        <div class="eyebrow" style="margin-bottom:16px;opacity:0.5;">Comprar</div>
+        <ul style="display:flex;flex-direction:column;gap:10px;font-size:14px;">
+          <li><a href="/0kcals/collections/all" class="link-underline">Todos los productos</a></li>
+          <li><a href="/0kcals/collections/syrups" class="link-underline">Syrups</a></li>
+          <li><a href="/0kcals/collections/proteina" class="link-underline">Proteína</a></li>
+          <li><a href="/0kcals/collections/snacks" class="link-underline">Snacks</a></li>
+          <li><a href="/0kcals/collections/hidratacion" class="link-underline">Hidratación</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <div class="eyebrow" style="margin-bottom:16px;opacity:0.5;">Compañía</div>
+        <ul style="display:flex;flex-direction:column;gap:10px;font-size:14px;">
+          <li><a href="/0kcals/pages/nosotros" class="link-underline">Nosotros</a></li>
+          <li><a href="/0kcals/pages/contacto" class="link-underline">Contacto</a></li>
+          <li><a href="/0kcals/pages/contacto#marca" class="link-underline">¿Tienes una marca?</a></li>
+          <li><a href="/0kcals/pages/envios" class="link-underline">Envíos</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <div class="eyebrow" style="margin-bottom:16px;opacity:0.5;">Síguenos</div>
+        <ul style="display:flex;flex-direction:column;gap:10px;font-size:14px;"></ul>
+      </div>
+
+    </div>
+
+    <div style="margin-top:48px;padding-top:24px;border-top:1px solid rgba(255,255,255,0.12);display:flex;justify-content:space-between;font-size:12px;opacity:0.6;font-family:'JetBrains Mono',monospace;letter-spacing:0.06em;text-transform:uppercase;">
+      <span>© 2026 0KCALS · Perú</span>
+      <span>Hecho con cero culpa</span>
+    </div>
+
+  </div>
+</footer>
+
+<style>
+.footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 32px; padding-top: 40px; border-top: 1px solid rgba(255,255,255,0.12); }
+@media (max-width: 900px) { .footer-grid { grid-template-columns: 1fr 1fr; gap: 40px; } }
+@media (max-width: 480px) { .footer-grid { grid-template-columns: 1fr; } }
+</style>
+
+
+</div>
+
+  <script>window.__0K = {"base":"/0kcals","wa":"0","waIcon":"\u003csvg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"currentColor\" aria-hidden=\"true\">\n            \u003cpath d=\"M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z\"/>\n          \u003c/svg>","variants":{"1001":{"product_title":"More Zerup Vainilla","vendor":"More Nutrition","url":"/products/more-vainilla","image":"/media/zerup-vainilla.webp","price":3900,"card_color":"#ffe566"},"1002":{"product_title":"More Zerup Peach","vendor":"More Nutrition","url":"/products/more-peach","image":"/media/zerup-peach.webp","price":3900,"card_color":"#b6ffe0"},"1003":{"product_title":"More Zerup Hazelnut","vendor":"More Nutrition","url":"/products/more-hazelnut","image":"/media/zerup-hazelnut.webp","price":3900,"card_color":"#ebe7d8"},"1004":{"product_title":"More Zerup Apple Cranberry","vendor":"More Nutrition","url":"/products/more-apple-cranberry","image":"/media/zerup-apple-cranberry.webp","price":3900,"card_color":"#39ff9e"},"1005":{"product_title":"More Zerup Chocolate","vendor":"More Nutrition","url":"/products/more-chocolate","image":"/media/zerup-chocolate.webp","price":3900,"card_color":"#003d22"}}};</script>
+  <script src="/0kcals/assets/0k-shim.js"></script><script src="/0kcals/assets/cart-drawer.js" type="text/javascript"></script><script src="/0kcals/assets/animations.js" defer></script>
+
+</body>
+</html>

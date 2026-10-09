@@ -1,0 +1,1255 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="theme-color" content="#003d22">
+
+  <title>¿Qué son los Zerups? — 0KCALS</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet"><link href="/0kcals/assets/base.css" rel="stylesheet" type="text/css" media="all" /></head>
+
+<body class="shell template-page-zerup">
+  <div id="scroll-progress"></div>
+  <div id="cursor-dot"></div>
+  <div class="grain" aria-hidden="true"></div>
+
+  <svg aria-hidden="true" focusable="false" style="position:absolute;width:0;height:0;overflow:hidden;pointer-events:none;">
+    <defs>
+      <!--
+        Lens displacement map:
+          R channel = horizontal gradient (black left → white right)
+          G channel = vertical gradient   (black top  → white bottom)
+        feDisplacementMap uses R for X and G for Y.
+        With scale=60 this creates ~10% uniform magnification at the pill edges —
+        content behind appears enlarged, like a flat convex glass lens.
+        Falls back gracefully: Safari sees only blur (no SVG in backdrop-filter).
+      -->
+      <filter id="pill-lens" x="-44%" y="-90%" width="188%" height="280%" color-interpolation-filters="sRGB">
+        <!-- Horizontal ramp: black(left) → white(right) -->
+        <feImage result="h-map" preserveAspectRatio="none"
+          href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='2' height='1'%3E%3ClinearGradient id='g'%3E%3Cstop offset='0' stop-color='black'/%3E%3Cstop offset='1' stop-color='white'/%3E%3C/linearGradient%3E%3Crect width='2' height='1' fill='url(%23g)'/%3E%3C/svg%3E"/>
+        <!-- Vertical ramp: black(top) → white(bottom) -->
+        <feImage result="v-map" preserveAspectRatio="none"
+          href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1' height='2'%3E%3ClinearGradient id='g' x1='0' x2='0' y1='0' y2='1'%3E%3Cstop offset='0' stop-color='black'/%3E%3Cstop offset='1' stop-color='white'/%3E%3C/linearGradient%3E%3Crect width='1' height='2' fill='url(%23g)'/%3E%3C/svg%3E"/>
+        <!-- Extract R channel from h-map -->
+        <feColorMatrix in="h-map" type="matrix"
+          values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0 1"
+          result="r-ch"/>
+        <!-- Move R from v-map into G channel -->
+        <feColorMatrix in="v-map" type="matrix"
+          values="0 0 0 0 0  1 0 0 0 0  0 0 0 0 0  0 0 0 0 1"
+          result="g-ch"/>
+        <!-- Merge: R = horizontal, G = vertical -->
+        <feBlend in="r-ch" in2="g-ch" mode="screen" result="lens-map"/>
+        <!-- Apply lens displacement (~10% magnification) -->
+        <feDisplacementMap in="SourceGraphic" in2="lens-map" scale="60"
+          xChannelSelector="R" yChannelSelector="G" result="magnified"/>
+        <!-- Slight glass softness -->
+        <feGaussianBlur in="magnified" stdDeviation="0.4"/>
+      </filter>
+    </defs>
+  </svg>
+
+  <div id="shopify-section-header" class="shopify-section">
+<header id="site-header">
+  <div id="header-inner">
+
+    <a href="/0kcals/" aria-label="0KCALS"><svg xmlns="http://www.w3.org/2000/svg"
+       viewBox="0 0 800 200"
+       width="160" height="40"
+       fill="none"
+       aria-label="0KCALS"
+       style="display:block;flex-shrink:0;">
+    <ellipse cx="90" cy="100" rx="62" ry="82"
+             stroke="currentColor" stroke-width="9" fill="none"/>
+    <text x="185" y="138"
+          fill="currentColor"
+          font-family="'Archivo Black', Impact, sans-serif"
+          font-size="130"
+          letter-spacing="-3">0KCALS</text>
+  </svg></a>
+
+    <nav class="header-nav" aria-label="Principal">
+      <a href="/0kcals/" class="nav-link" >Inicio</a>
+      <a href="/0kcals/pages/zerup" class="nav-link" data-active="1">¿Qué son los Zerups?</a>
+      <a href="/0kcals/collections/all" class="nav-link" >Productos</a>
+      <a href="/0kcals/pages/nosotros" class="nav-link" >Nosotros</a>
+      <a href="/0kcals/pages/contacto" class="nav-link" >Contacto</a>
+    </nav>
+
+    <div style="display:flex;gap:12px;align-items:center;">
+      <a href="/0kcals/collections/all" class="btn btn--sm header-cta-desktop">Comprar</a>
+      <button id="cart-open-btn" aria-label="Abrir carrito" style="position:relative;width:44px;height:44px;border-radius:999px;border:1.5px solid rgba(0,0,0,0.12);background:transparent;color:inherit;display:grid;place-items:center;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M5 7h14l-1.5 13.5a2 2 0 0 1-2 1.5h-7a2 2 0 0 1-2-1.5z"/>
+          <path d="M9 7V5a3 3 0 0 1 6 0v2"/>
+        </svg><span class="badge" id="cart-count" style="display:none;">0</span></button>
+      <button id="menu-toggle" aria-label="Abrir menú" aria-expanded="false" style="display:none;width:44px;height:44px;border-radius:999px;border:1.5px solid rgba(0,0,0,0.12);background:transparent;color:inherit;align-items:center;justify-content:center;cursor:pointer;">
+        <svg id="menu-icon-open" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+        <svg id="menu-icon-close" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="display:none;">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+
+  </div>
+</header>
+
+<div id="header-pill">
+  <a href="/0kcals/" aria-label="0KCALS"><svg xmlns="http://www.w3.org/2000/svg"
+       viewBox="0 0 800 200"
+       width="160" height="40"
+       fill="none"
+       aria-label="0KCALS"
+       style="display:block;flex-shrink:0;">
+    <ellipse cx="90" cy="100" rx="62" ry="82"
+             stroke="currentColor" stroke-width="9" fill="none"/>
+    <text x="185" y="138"
+          fill="currentColor"
+          font-family="'Archivo Black', Impact, sans-serif"
+          font-size="130"
+          letter-spacing="-3">0KCALS</text>
+  </svg></a>
+  <nav class="pill-nav" aria-label="Principal">
+    <a href="/0kcals/" class="nav-link">Inicio</a>
+    <a href="/0kcals/pages/zerup" class="nav-link">¿Qué son los Zerups?</a>
+    <a href="/0kcals/collections/all" class="nav-link">Productos</a>
+    <a href="/0kcals/pages/nosotros" class="nav-link">Nosotros</a>
+    <a href="/0kcals/pages/contacto" class="nav-link">Contacto</a>
+  </nav>
+  <button id="pill-cart-btn" class="pill-cart-btn" aria-label="Abrir carrito" style="position:relative;width:36px;height:36px;border-radius:999px;border:1.5px solid rgba(0,0,0,0.12);background:transparent;color:inherit;display:grid;place-items:center;flex-shrink:0;cursor:pointer;">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M5 7h14l-1.5 13.5a2 2 0 0 1-2 1.5h-7a2 2 0 0 1-2-1.5z"/>
+      <path d="M9 7V5a3 3 0 0 1 6 0v2"/>
+    </svg>
+    <span class="badge" id="pill-cart-count" style="display:none;">0</span>
+  </button>
+  <button id="pill-menu-btn" class="pill-menu-btn" aria-label="Menú" style="width:36px;height:36px;border-radius:999px;border:1.5px solid rgba(0,0,0,0.12);background:transparent;color:inherit;display:none;place-items:center;flex-shrink:0;cursor:pointer;">
+    <svg class="pill-icon-open" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+      <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+    </svg>
+    <svg class="pill-icon-close" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="display:none;" aria-hidden="true">
+      <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+    </svg>
+  </button>
+</div>
+
+<div id="mobile-menu" style="display:none;position:fixed;inset:0;z-index:60;background:var(--bone);flex-direction:column;">
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:0 24px;height:var(--nav-height);flex-shrink:0;border-bottom:1px solid rgba(0,0,0,0.06);">
+    <a href="/0kcals/" aria-label="0KCALS"><svg xmlns="http://www.w3.org/2000/svg"
+       viewBox="0 0 800 200"
+       width="160" height="40"
+       fill="none"
+       aria-label="0KCALS"
+       style="display:block;flex-shrink:0;">
+    <ellipse cx="90" cy="100" rx="62" ry="82"
+             stroke="currentColor" stroke-width="9" fill="none"/>
+    <text x="185" y="138"
+          fill="currentColor"
+          font-family="'Archivo Black', Impact, sans-serif"
+          font-size="130"
+          letter-spacing="-3">0KCALS</text>
+  </svg></a>
+    <button id="mobile-menu-close" aria-label="Cerrar menú" style="width:36px;height:36px;border-radius:999px;border:1.5px solid rgba(0,0,0,0.12);background:transparent;color:inherit;display:grid;place-items:center;cursor:pointer;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+      </svg>
+    </button>
+  </div>
+  <div style="padding:32px 24px;display:flex;flex-direction:column;gap:8px;flex:1;">
+    <a href="/0kcals/" class="display" style="font-size:clamp(32px,10vw,48px);line-height:1;padding:12px 0;border-bottom:1px solid rgba(0,0,0,0.08);">INICIO</a>
+    <a href="/0kcals/pages/zerup" class="display" style="font-size:clamp(32px,10vw,48px);line-height:1;padding:12px 0;border-bottom:1px solid rgba(0,0,0,0.08);">¿QUÉ SON LOS ZERUPS?</a>
+    <a href="/0kcals/collections/all" class="display" style="font-size:clamp(32px,10vw,48px);line-height:1;padding:12px 0;border-bottom:1px solid rgba(0,0,0,0.08);">PRODUCTOS</a>
+    <a href="/0kcals/pages/nosotros" class="display" style="font-size:clamp(32px,10vw,48px);line-height:1;padding:12px 0;border-bottom:1px solid rgba(0,0,0,0.08);">NOSOTROS</a>
+    <a href="/0kcals/pages/contacto" class="display" style="font-size:clamp(32px,10vw,48px);line-height:1;padding:12px 0;border-bottom:1px solid rgba(0,0,0,0.08);">CONTACTO</a>
+    <a href="/0kcals/collections/all" class="btn btn--mint btn--lg" style="margin-top:32px;justify-content:center;">Comprar →</a>
+    <a href="/0kcals/pages/drop002" class="display mob-drop-link">
+      <span class="eyebrow mob-drop-eye">★ DROP 002</span>
+      PREORDENA
+    </a>
+  </div>
+</div>
+
+<style>
+/* ── DROP BAR ── */
+.drop-bar {
+  background: var(--yellow);
+  text-align: center;
+  padding: 9px 16px;
+  box-shadow:
+    0 0 12px rgba(255,229,102,0.45),
+    0 0 36px rgba(255,200,50,0.25),
+    0 0 70px rgba(255,175,20,0.12);
+  animation: hero-cta-twinkle 5s ease-in-out infinite;
+  position: relative;
+  z-index: 51;
+}
+.drop-bar-link {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--green-900);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.drop-bar-link:hover { opacity: 0.75; }
+
+/* ── MOBILE DROP 002 ENTRY ── */
+.mob-drop-link {
+  font-size: clamp(32px,10vw,48px);
+  line-height: 1;
+  padding: 16px 24px;
+  margin: 16px -24px -32px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: var(--yellow);
+  color: var(--green-900);
+  text-decoration: none;
+  box-shadow:
+    0 0 0 1px rgba(255,229,102,0.3),
+    0 0 12px rgba(255,229,102,0.45),
+    0 0 36px rgba(255,200,50,0.25),
+    0 0 70px rgba(255,175,20,0.12);
+  animation: hero-cta-twinkle 5s ease-in-out infinite;
+}
+.mob-drop-eye {
+  color: var(--green-900);
+  opacity: 0.55;
+  font-size: 10px;
+}
+
+.header-nav { display: flex; gap: 36px; align-items: center; }
+@media (max-width: 768px) {
+  .header-nav { display: none; }
+  .header-cta-desktop { display: none !important; }
+  #menu-toggle { display: flex !important; }
+}
+</style>
+
+<script>
+(function(){
+  var toggle = document.getElementById('menu-toggle');
+  var menu = document.getElementById('mobile-menu');
+  var closeBtn = document.getElementById('mobile-menu-close');
+  var iconOpen = document.getElementById('menu-icon-open');
+  var iconClose = document.getElementById('menu-icon-close');
+  var pillMenuBtn = document.getElementById('pill-menu-btn');
+  var pillIconOpen = pillMenuBtn ? pillMenuBtn.querySelector('.pill-icon-open') : null;
+  var pillIconClose = pillMenuBtn ? pillMenuBtn.querySelector('.pill-icon-close') : null;
+  var pill = document.getElementById('header-pill');
+  var open = false;
+
+  function setMenuState(isOpen) {
+    open = isOpen;
+    menu.style.display = open ? 'flex' : 'none';
+    iconOpen.style.display = open ? 'none' : 'block';
+    iconClose.style.display = open ? 'block' : 'none';
+    toggle.setAttribute('aria-expanded', open);
+    document.body.style.overflow = open ? 'hidden' : '';
+    if (pillIconOpen) pillIconOpen.style.display = open ? 'none' : 'block';
+    if (pillIconClose) pillIconClose.style.display = open ? 'block' : 'none';
+    if (pill) { pill.style.opacity = open ? '0' : ''; pill.style.pointerEvents = open ? 'none' : ''; }
+  }
+
+  toggle.addEventListener('click', function() { setMenuState(!open); });
+  if (closeBtn) closeBtn.addEventListener('click', function() { setMenuState(false); });
+  if (pillMenuBtn) pillMenuBtn.addEventListener('click', function() { setMenuState(!open); });
+
+  menu.querySelectorAll('a').forEach(function(link) {
+    link.addEventListener('click', function() { setMenuState(false); });
+  });
+
+  // Pill cart button → open drawer + sync badge
+  var pillCartBtn = document.getElementById('pill-cart-btn');
+  var pillCartCount = document.getElementById('pill-cart-count');
+  var mainCartCount = document.getElementById('cart-count');
+  if (pillCartBtn) {
+    pillCartBtn.addEventListener('click', function() {
+      document.getElementById('cart-open-btn').click();
+    });
+  }
+  if (mainCartCount && pillCartCount) {
+    new MutationObserver(function() {
+      pillCartCount.textContent = mainCartCount.textContent;
+      pillCartCount.style.display = mainCartCount.style.display;
+    }).observe(mainCartCount, { childList: true, attributes: true, attributeFilter: ['style'] });
+  }
+})();
+</script>
+
+
+</div>
+
+  <div id="shopify-section-cart-drawer" class="shopify-section"><div id="cart-overlay" class="cart-overlay" aria-hidden="true"></div>
+
+<aside id="cart-drawer" class="cart-drawer" aria-label="Tu bolsa" role="dialog" aria-modal="true" aria-hidden="true">
+  <div id="cart-drawer-inner" style="display:flex;flex-direction:column;height:100%;">
+
+    <div style="padding:24px 28px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(0,0,0,0.08);">
+      <div class="display" style="font-size:28px;">TU BOLSA</div>
+      <button id="cart-close-btn" aria-label="Cerrar" style="width:36px;height:36px;border-radius:999px;border:1.5px solid rgba(0,0,0,0.12);background:transparent;cursor:pointer;font-size:16px;font-weight:700;">✕</button>
+    </div><div style="flex:1;display:grid;place-items:center;padding:32px;text-align:center;">
+        <div>
+          <div class="display" style="font-size:48px;margin-bottom:12px;">VACÍA</div>
+          <p style="opacity:0.6;margin-bottom:20px;">Aún no agregaste nada.<br>Y eso, sí cuesta calorías.</p>
+          <a href="/0kcals/collections/all" class="btn btn--mint">Ver productos →</a>
+        </div>
+      </div></div>
+</aside>
+
+
+</div>
+
+  <main id="main-content" tabindex="-1">
+    <div id="shopify-section-main" class="shopify-section"><div class="page">
+
+  <!-- ══ 01 · HERO ══════════════════════════════════════════════════════════ -->
+  <section data-section="zerup-hero" style="background:var(--green-900);color:var(--mint-100);padding:clamp(60px,10vw,120px) 0;position:relative;overflow:hidden;">
+    <div data-parallax-blob style="position:absolute;left:-80px;top:-80px;width:500px;height:500px;border-radius:50%;background:var(--mint-500);filter:blur(120px);opacity:0.18;pointer-events:none;"></div>
+    <div data-parallax-blob style="position:absolute;right:-60px;bottom:-100px;width:420px;height:420px;border-radius:50%;background:var(--yellow);filter:blur(110px);opacity:0.12;pointer-events:none;"></div>
+    <div aria-hidden="true" style="position:absolute;right:-60px;top:50%;transform:translateY(-50%);font-family:'Archivo Black',Impact,sans-serif;font-size:clamp(400px,55vw,800px);line-height:0.85;color:var(--mint-500);opacity:0.045;pointer-events:none;user-select:none;letter-spacing:-0.05em;">0</div><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 800"
+  style="position:absolute;left:55%;top:-5%;width:340px;height:453px;pointer-events:none;opacity:0.07;">
+  <defs>
+    <path id="lwm-"
+      d="M 300 118.5 A 181.5 281.5 0 1 1 300 681.5 A 181.5 281.5 0 1 1 300 118.5"
+      fill="none"/>
+  </defs>
+  <ellipse cx="300" cy="400" rx="220" ry="320"
+    fill="none" stroke="#39ff9e" stroke-width="13"/>
+  <text font-family="'JetBrains Mono',monospace"
+    font-size="26" font-weight="700"
+    fill="#39ff9e" letter-spacing="6" text-anchor="middle">
+    <textPath href="#lwm-" startOffset="50%" side="right">
+      CALS  ·  SUGAR  ·  GUILT  ·  STRESS  ·  REGRETS  ·  CARBS  ·  DRAMA  ·  BULLSHIT  ·
+    </textPath>
+  </text>
+  <text x="300" y="422" text-anchor="middle"
+    fill="#39ff9e"
+    font-family="'Archivo Black',Impact,sans-serif"
+    font-size="72" letter-spacing="-2">0KCALS</text>
+</svg>
+<div class="container" style="position:relative;z-index:1;">
+      <div class="eyebrow" style="color:var(--mint-500);margin-bottom:20px;">// 0KCALS EXPLICA</div>
+      <h1 class="display" style="font-size:clamp(56px,11vw,160px);margin:0;line-height:0.84;letter-spacing:-0.02em;">
+        ¿QUÉ SON LOS<br>
+        <span style="color:var(--mint-500);">ZERUPS?</span>
+      </h1>
+      <p style="font-size:clamp(16px,2vw,20px);line-height:1.6;margin-top:clamp(20px,3vw,32px);max-width:540px;opacity:0.75;">
+        Te lo contamos sin rodeos. Para que lo entiendas tú, tu hermano pequeño, tu abuela y tu entrenador.
+      </p>
+      <div style="margin-top:24px;">
+        <span class="tag tag--dark" style="background:var(--mint-500);color:var(--green-900);">SIROPE CONCENTRADO · MORE NUTRITION · 0 AZÚCAR</span>
+      </div>
+      <div style="margin-top:clamp(28px,4vw,40px);display:flex;justify-content:flex-end;">
+        <a href="/0kcals/pages/drop002" class="btn btn--yellow btn--lg page-drop-btn">PRE-ORDENA DROP 002 →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ 02 · QUÉ ES ════════════════════════════════════════════════════════ -->
+  <section data-section="zerup-que" style="background:var(--bone);padding:var(--section-pad-y) 0;position:relative;overflow:hidden;">
+    <div data-parallax-blob style="position:absolute;left:-120px;top:-60px;width:480px;height:480px;border-radius:50%;background:var(--mint-200);filter:blur(100px);opacity:0.7;pointer-events:none;"></div>
+    <div data-parallax-blob style="position:absolute;right:-80px;bottom:-80px;width:380px;height:380px;border-radius:50%;background:var(--yellow);filter:blur(100px);opacity:0.45;pointer-events:none;"></div>
+    <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 800" style="position:absolute;right:-3%;top:-10%;width:300px;height:400px;opacity:0.045;pointer-events:none;color:var(--ink);">
+      <ellipse cx="300" cy="400" rx="220" ry="320" stroke="currentColor" stroke-width="13" fill="none"/>
+    </svg>
+    <div class="container" style="position:relative;">
+      <div class="eyebrow" style="margin-bottom:12px;">// QUÉ ES EXACTAMENTE</div>
+      <h2 class="display" style="font-size:clamp(36px,6vw,80px);margin:0 0 28px;line-height:0.9;">
+        UN SIROPE.<br>MUCHO SABOR.<br><span style="color:var(--green-900);">CERO AZÚCAR.</span>
+      </h2>
+      <p style="font-size:clamp(15px,1.8vw,18px);line-height:1.65;max-width:680px;opacity:0.8;margin:0 0 48px;">
+        Zerup es un <strong>sirope concentrado</strong> que transforma cualquier vaso de agua en una bebida deliciosa, sin azúcar y sin calorías. <strong>Una botellita pequeña rinde hasta 12 litros.</strong>
+      </p>
+
+      <div class="zerup-features-grid">
+        <div class="zerup-feat">
+          <div class="zerup-feat-num">0g</div>
+          <div class="zerup-feat-title">Sin azúcar</div>
+          <p class="zerup-feat-desc">El sabor dulce viene de edulcorantes que no aportan casi calorías.</p>
+        </div>
+        <div class="zerup-feat">
+          <div class="zerup-feat-num">0</div>
+          <div class="zerup-feat-title">Kcal por vaso</div>
+          <p class="zerup-feat-desc">Un refresco normal tiene entre 80 y 100 kcal. Con Zerup, cero.</p>
+        </div>
+        <div class="zerup-feat">
+          <div class="zerup-feat-num">×80</div>
+          <div class="zerup-feat-title">Muy concentrado</div>
+          <p class="zerup-feat-desc">Un chorrito pequeño hace un vaso entero. Una botellita dura semanas.</p>
+        </div>
+        <div class="zerup-feat">
+          <div class="zerup-feat-num">15+</div>
+          <div class="zerup-feat-title">Sabores</div>
+          <p class="zerup-feat-desc">Limón, cola, frutas, té helado, vainilla, caramelo y muchos más.</p>
+        </div>
+        <div class="zerup-feat">
+          <div class="zerup-feat-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="28" height="28">
+              <rect x="3" y="9" width="18" height="13" rx="2"/>
+              <path d="M8 9V6.5a4 4 0 0 1 8 0V9"/>
+              <line x1="3" y1="14" x2="21" y2="14"/>
+              <circle cx="12" cy="11.5" r="1.2" fill="currentColor" stroke="none"/>
+            </svg>
+          </div>
+          <div class="zerup-feat-title">Cabe en el bolso</div>
+          <p class="zerup-feat-desc">En casa, en la oficina, en el gimnasio o de viaje. Siempre a mano.</p>
+        </div>
+      </div>
+
+      <button class="btn btn--ghost zerup-nutri-btn" onclick="zerUpOpenNutri()" style="margin-top:36px;">
+        Ver tabla nutricional
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="14" height="14" style="margin-left:6px;vertical-align:-1px;"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+      </button>
+    </div>
+  </section>
+
+  <!-- ══ 03 · PASOS ═════════════════════════════════════════════════════════ -->
+  <section data-section="zerup-pasos" style="background:var(--bone);padding:var(--section-pad-y) 0;position:relative;overflow:hidden;">
+    <div data-parallax-blob style="position:absolute;left:-60px;top:50%;transform:translateY(-50%);width:400px;height:400px;border-radius:50%;background:var(--mint-200);filter:blur(100px);opacity:0.55;pointer-events:none;"></div>
+    <div data-parallax-blob style="position:absolute;right:-80px;bottom:-40px;width:360px;height:360px;border-radius:50%;background:var(--yellow);filter:blur(110px);opacity:0.35;pointer-events:none;"></div>
+    <div class="container">
+      <div class="eyebrow" style="margin-bottom:12px;">// PASO A PASO</div>
+      <h2 class="display" style="font-size:clamp(36px,6vw,80px);margin:0 0 40px;line-height:0.9;">
+        TRES PASOS.<br><span style="color:var(--green-900);">NI UNO MÁS.</span>
+      </h2>
+
+      <div class="zerup-steps-grid">
+        <div class="zerup-step">
+          <div class="zerup-step-num">1</div>
+          <h3 class="zerup-step-title">Llena el vaso</h3>
+          <p class="zerup-step-desc">Agua fría, caliente, con gas o sin gas. Lo que tengas a mano.</p>
+        </div>
+        <div class="zerup-step">
+          <div class="zerup-step-num">2</div>
+          <h3 class="zerup-step-title">Echa un chorrito</h3>
+          <p class="zerup-step-desc">Es muy concentrado. Empieza con poco —unos 1,5 ml— y ajusta al gusto.</p>
+        </div>
+        <div class="zerup-step">
+          <div class="zerup-step-num">3</div>
+          <h3 class="zerup-step-title">Remueve y prueba</h3>
+          <p class="zerup-step-desc">¿Quieres más sabor? Un poco más. ¿Está perfecto? Ya está.</p>
+        </div>
+      </div>
+
+      <div class="zerup-otros-usos">
+        <div class="eyebrow" style="margin-bottom:14px;opacity:0.45;">También funciona en</div>
+        <div class="zerup-otros-row">
+          <span class="zerup-otro">Yogur y skyr</span>
+          <span class="zerup-otro">Tortitas y postres caseros</span>
+          <span class="zerup-otro">Batidos y zumos ligeros</span>
+          <span class="zerup-otro">Avena caliente</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ 04 · PREGUNTAS ════════════════════════════════════════════════════ -->
+  <section data-section="zerup-faq" style="background:var(--bone-2);padding:var(--section-pad-y) 0;position:relative;overflow:hidden;">
+    <div data-parallax-blob style="position:absolute;right:-60px;top:-60px;width:440px;height:440px;border-radius:50%;background:var(--mint-200);filter:blur(110px);opacity:0.5;pointer-events:none;"></div>
+    <div data-parallax-blob style="position:absolute;left:-100px;bottom:-80px;width:360px;height:360px;border-radius:50%;background:var(--yellow);filter:blur(100px);opacity:0.28;pointer-events:none;"></div>
+    <div class="container">
+      <div class="eyebrow" style="margin-bottom:12px;">// LO QUE TODO EL MUNDO PREGUNTA</div>
+      <h2 class="display" style="font-size:clamp(36px,6vw,80px);margin:0 0 40px;line-height:0.9;">
+        LAS DUDAS<br><span style="color:var(--green-900);">DE SIEMPRE.</span>
+      </h2>
+
+      <div class="zerup-faq">
+        <div class="zerup-faq-item">
+          <button class="zerup-faq-trigger" aria-expanded="false">
+            <h3 class="zerup-faq-q">¿AYUDA A TOMAR MÁS AGUA?</h3>
+            <span class="zerup-faq-chevron" aria-hidden="true">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M3 6l5 5 5-5"/></svg>
+            </span>
+          </button>
+          <div class="zerup-faq-body">
+            <p class="zerup-faq-a">Sí. Cuando el agua sabe bien, tomar más se vuelve automático. Mucha gente termina bebiendo mucho más sin siquiera darse cuenta.</p>
+          </div>
+        </div>
+        <div class="zerup-faq-item">
+          <button class="zerup-faq-trigger" aria-expanded="false">
+            <h3 class="zerup-faq-q">¿SABE A REFRESCO, PERO SIN AZÚCAR?</h3>
+            <span class="zerup-faq-chevron" aria-hidden="true">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M3 6l5 5 5-5"/></svg>
+            </span>
+          </button>
+          <div class="zerup-faq-body">
+            <p class="zerup-faq-a">Exactamente. Sabe a durazno, cola, té helado, café tipo starbucks o incluso mocktails, pero sin el azúcar ni las calorías de las bebidas tradicionales.</p>
+          </div>
+        </div>
+        <div class="zerup-faq-item">
+          <button class="zerup-faq-trigger" aria-expanded="false">
+            <h3 class="zerup-faq-q">¿CUÁNTO DURA UNA BOTELLITA?</h3>
+            <span class="zerup-faq-chevron" aria-hidden="true">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M3 6l5 5 5-5"/></svg>
+            </span>
+          </button>
+          <div class="zerup-faq-body">
+            <p class="zerup-faq-a">Muchísimo más de lo que imaginas. Cada Zerup rinde entre 10 y 12 litros, así que una botellita puede acompañarte durante semanas.</p>
+          </div>
+        </div>
+        <div class="zerup-faq-item">
+          <button class="zerup-faq-trigger" aria-expanded="false">
+            <h3 class="zerup-faq-q">¿LO PUEDO LLEVAR A TODAS PARTES?</h3>
+            <span class="zerup-faq-chevron" aria-hidden="true">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M3 6l5 5 5-5"/></svg>
+            </span>
+          </button>
+          <div class="zerup-faq-body">
+            <p class="zerup-faq-a">Sí. Llévalo a la u, las previas, oficina, gimnasio, viajes o hasta restaurantes, solo necesitas agua.</p>
+          </div>
+        </div>
+        <div class="zerup-faq-item">
+          <button class="zerup-faq-trigger" aria-expanded="false">
+            <h3 class="zerup-faq-q">¿QUÉ PASA CUANDO LO PRUEBAS?</h3>
+            <span class="zerup-faq-chevron" aria-hidden="true">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M3 6l5 5 5-5"/></svg>
+            </span>
+          </button>
+          <div class="zerup-faq-body">
+            <p class="zerup-faq-a">Lo más probable es que no quieras volver al agua triste ni a los refrescos llenos de azúcar.</p>
+          </div>
+        </div>
+        <div class="zerup-faq-item">
+          <button class="zerup-faq-trigger" aria-expanded="false">
+            <h3 class="zerup-faq-q">¿ES PARA MÍ?</h3>
+            <span class="zerup-faq-chevron" aria-hidden="true">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M3 6l5 5 5-5"/></svg>
+            </span>
+          </button>
+          <div class="zerup-faq-body">
+            <p class="zerup-faq-a">Si quieres beber más agua, reducir azúcar o simplemente disfrutar algo rico sin culpa, la respuesta es sí.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ 05 · LOS 3 TIPOS ═══════════════════════════════════════════════════ -->
+  <section data-section="zerup-tipos" style="background:var(--green-900);color:var(--mint-100);padding:var(--section-pad-y) 0;position:relative;overflow:hidden;">
+    <div data-parallax-blob style="position:absolute;right:-80px;top:60px;width:500px;height:500px;border-radius:50%;background:var(--mint-500);filter:blur(120px);opacity:0.18;pointer-events:none;"></div>
+    <div data-parallax-blob style="position:absolute;left:-60px;bottom:-60px;width:380px;height:380px;border-radius:50%;background:var(--yellow);filter:blur(110px);opacity:0.12;pointer-events:none;"></div>
+    <div class="container" style="position:relative;z-index:1;">
+      <div class="eyebrow" style="color:var(--mint-500);margin-bottom:12px;">// ELIGE EL TUYO</div>
+      <h2 class="display" style="font-size:clamp(36px,6vw,80px);margin:0 0 40px;line-height:0.9;">
+        CUATRO TIPOS.<br><span style="color:var(--mint-500);">UN MISMO CERO.</span>
+      </h2>
+
+      <div class="zerup-tipos-grid">
+
+        <!-- CLÁSICO -->
+        <div class="zerup-tipo zerup-tipo--clasico">
+          <div class="zerup-tipo-head">
+            <div class="zerup-tipo-icon zerup-tipo-icon--mint">
+              <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="32" height="32">
+                <path d="M16 4C16 4 8 13 8 19a8 8 0 0 0 16 0C24 13 16 4 16 4z"/>
+                <path d="M11 20Q13 18 16 19.5Q19 21 21 19" stroke-width="1.2" opacity="0.6"/>
+              </svg>
+            </div>
+            <div>
+              <h3 class="zerup-tipo-name">Classic Zerup</h3>
+              <span class="tag zerup-tipo-tag zerup-tipo-tag--mint">Para el agua · Uso diario</span>
+            </div>
+          </div>
+          <p class="zerup-tipo-desc">El Zerup de toda la vida. Para convertir el agua del día en algo rico sin azúcar.</p>
+          <ul class="zerup-tipo-usos">
+            <li>Que el agua sepa a refresco o zumo sin azúcar.</li>
+            <li>Mezclar con agua con gas para una soda ligera.</li>
+            <li>Llevar siempre uno encima: escritorio, clase, gimnasio o viaje.</li>
+          </ul>
+          <div class="zerup-tipo-sabores">
+            <div class="eyebrow" style="color:var(--mint-500);margin-bottom:10px;opacity:0.7;">Sabores habituales</div>
+            <div class="zerup-sabores-row">
+              <span class="zerup-sabor">Limón</span>
+              <span class="zerup-sabor">Cola</span>
+              <span class="zerup-sabor">Frutos rojos</span>
+              <span class="zerup-sabor">Té helado melocotón</span>
+              <span class="zerup-sabor">Fresa</span>
+            </div>
+          </div>
+          <div class="zerup-tipo-resumen">
+            <p>Los sabores de Zerup para usar cada día. Que beber agua se convierta en un hábito porque sabe bien, sin sumar azúcar ni calorías.</p>
+          </div>
+        </div>
+
+        <!-- BARISTA -->
+        <div class="zerup-tipo zerup-tipo--barista">
+          <div class="zerup-tipo-head">
+            <div class="zerup-tipo-icon zerup-tipo-icon--bone">
+              <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="32" height="32">
+                <path d="M7 14h14l-2 10H9z"/>
+                <path d="M21 16h2a3 3 0 0 1 0 6h-2"/>
+                <path d="M5 24h18"/>
+                <path d="M11 11Q10 9 11 7" stroke-width="1.2" opacity="0.5"/>
+                <path d="M15 10Q14 8 15 6" stroke-width="1.2" opacity="0.5"/>
+                <path d="M19 11Q18 9 19 7" stroke-width="1.2" opacity="0.5"/>
+              </svg>
+            </div>
+            <div>
+              <h3 class="zerup-tipo-name">Barista Zerup</h3>
+              <span class="tag zerup-tipo-tag zerup-tipo-tag--bone">Para el café · Bebidas calientes</span>
+            </div>
+          </div>
+          <p class="zerup-tipo-desc">Siéntete como un barista en casa.</p>
+          <ul class="zerup-tipo-usos">
+            <li>Convierte cualquier café en un vanilla latte, salted caramel o mocha en segundos.</li>
+            <li>Perfecto para café caliente, frappuccino, avena y batidos.</li>
+            <li>Tip del equipo: mezcla el Zerup de chocolate con yogurt o leche y dale sabor.</li>
+          </ul>
+          <div class="zerup-tipo-sabores">
+            <div class="eyebrow" style="color:rgba(245,243,235,0.5);margin-bottom:10px;">Sabores habituales</div>
+            <div class="zerup-sabores-row">
+              <span class="zerup-sabor">Vainilla</span>
+              <span class="zerup-sabor">Caramelo salado</span>
+              <span class="zerup-sabor">Avellana</span>
+              <span class="zerup-sabor">Chocolate</span>
+            </div>
+          </div>
+          <div class="zerup-tipo-resumen">
+            <p>Tu café de todos los días, con vibes de Starbucks pero sin azúcar.</p>
+          </div>
+        </div>
+
+        <!-- MOCKTAILS -->
+        <div class="zerup-tipo zerup-tipo--mocktail">
+          <div class="zerup-tipo-head">
+            <div class="zerup-tipo-icon zerup-tipo-icon--yellow">
+              <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="32" height="32">
+                <path d="M8 7h16l-7 10v9"/>
+                <path d="M10 26h12"/>
+                <path d="M17.5 12L25 7" stroke-width="1.2" opacity="0.5"/>
+              </svg>
+            </div>
+            <div>
+              <h3 class="zerup-tipo-name">Mocktails Zerup</h3>
+              <span class="tag zerup-tipo-tag zerup-tipo-tag--yellow">Sin alcohol · Sin azúcar</span>
+            </div>
+          </div>
+          <p class="zerup-tipo-desc">Sabores inspirados en tus cócteles favoritos.<br>Perfectos para fiestas, parrillas o una tarde con amigos. Sin alcohol por defecto. Agrégale alcohol si la ocasión lo amerita.</p>
+          <ul class="zerup-tipo-usos">
+            <li>Sabores: Mojito, Piña Colada, Aperol, Hugo (Vino dulce) y más.</li>
+            <li>Mézclalos con agua con gas, hielo, hierbas frescas (menta, albahaca) y rodajas de fruta.</li>
+            <li>Empieza como mocktail. Termina como tú quieras.</li>
+          </ul>
+          <div class="zerup-tipo-sabores">
+            <div class="eyebrow" style="color:var(--yellow);margin-bottom:10px;opacity:0.7;">Sabores habituales</div>
+            <div class="zerup-sabores-row">
+              <span class="zerup-sabor">Mojito</span>
+              <span class="zerup-sabor">Piña Colada</span>
+              <span class="zerup-sabor">Aperol</span>
+              <span class="zerup-sabor">Aperol Cranberry</span>
+              <span class="zerup-sabor">Sweet Wine</span>
+            </div>
+          </div>
+          <div class="zerup-tipo-resumen">
+            <p>Sabores de cóctel que mezclas con agua con gas, hielo y fruta para hacer bebidas bonitas y ricas, sin alcohol ni azúcar. Para cualquier ocasión especial.</p>
+          </div>
+        </div>
+
+        <!-- REDBULL ZERUP -->
+        <div class="zerup-tipo zerup-tipo--redbull">
+          <div class="zerup-tipo-head">
+            <div class="zerup-tipo-icon zerup-tipo-icon--yellow">
+              <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="32" height="32">
+                <path d="M20 3L8 18h11l-7 11 17-19h-12z"/>
+              </svg>
+            </div>
+            <div>
+              <h3 class="zerup-tipo-name">Redbull Zerup</h3>
+              <span class="tag zerup-tipo-tag zerup-tipo-tag--yellow">Hidratación &amp; Energía</span>
+            </div>
+          </div>
+          <p class="zerup-tipo-desc">Sabores intensos con cafeína, vitaminas y electrolitos para esos días en los que necesitas un empujón extra. Todo el punch de una bebida funcional, sin azúcar y en formato de bolsillo.</p>
+          <ul class="zerup-tipo-usos">
+            <li>Cafeína para mantenerte enfocado.</li>
+            <li>Electrolitos para recuperarte.</li>
+            <li>Vitaminas del grupo B.</li>
+            <li>Ideal para estudiar, trabajar o entrenar.</li>
+            <li>Todo el boost, sin el crash.</li>
+          </ul>
+          <div class="zerup-tipo-sabores">
+            <div class="eyebrow" style="color:var(--yellow);margin-bottom:10px;opacity:0.7;">Sabores habituales</div>
+            <div class="zerup-sabores-row">
+              <span class="zerup-sabor">Strawberry Pineapple</span>
+              <span class="zerup-sabor">Blackberry Rush</span>
+              <span class="zerup-sabor">Tropical Fusion</span>
+            </div>
+          </div>
+          <div class="zerup-tipo-resumen">
+            <p>El boost que necesitas en el momento justo. Sin azúcar, sin crash, con todo el sabor de una energy drink en tu bolsillo.</p>
+          </div>
+        </div>
+
+      </div><!-- /zerup-tipos-grid -->
+    </div>
+  </section>
+
+  <!-- ══ 06 · CTA ════════════════════════════════════════════════════════════ -->
+  <section data-section="zerup-cta" style="background:var(--yellow);color:var(--green-900);padding:var(--section-pad-y) 0;position:relative;overflow:hidden;">
+    <div data-parallax-blob style="position:absolute;right:-80px;top:-80px;width:460px;height:460px;border-radius:50%;background:var(--yellow-2);filter:blur(80px);opacity:0.5;pointer-events:none;"></div>
+    <div data-parallax-blob style="position:absolute;left:-60px;bottom:-60px;width:340px;height:340px;border-radius:50%;background:var(--mint-500);filter:blur(90px);opacity:0.2;pointer-events:none;"></div>
+    <div class="container">
+      <h2 class="display" style="font-size:clamp(40px,7vw,100px);margin:0;line-height:0.88;max-width:900px;">
+        PROBADOS.<br>IMPORTADOS.<br><span style="font-style:italic;">DISPONIBLES.</span>
+      </h2>
+      <div style="display:flex;gap:16px;margin-top:40px;flex-wrap:wrap;">
+        <a href="/0kcals/collections/zerups" class="btn btn--green btn--lg">Ver Zerups →</a>
+        <a href="/0kcals/collections/all" class="btn btn--ghost btn--lg">Todo el catálogo</a>
+      </div>
+    </div>
+  </section>
+
+</div><!-- /page -->
+
+<!-- ══ POPUP TABLA NUTRICIONAL ═════════════════════════════════════════════ -->
+<div id="zerup-nutri-popup" class="zerup-popup-overlay" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Tabla nutricional">
+  <div class="zerup-popup">
+    <button class="zerup-popup-close" onclick="zerUpCloseNutri()" aria-label="Cerrar">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" width="16" height="16"><path d="M2 2l12 12M14 2L2 14"/></svg>
+    </button>
+    <div class="eyebrow" style="margin-bottom:6px;font-size:10px;">Valores nutricionales</div>
+    <p style="font-size:12px;opacity:0.5;margin:0 0 20px;font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:0.06em;">Por 100 ml de sirope concentrado</p>
+    <table class="zerup-nutri-table">
+      <thead>
+        <tr><th>Nutriente</th><th>Cantidad / 100 ml</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Energía</td><td>2 kcal</td></tr>
+        <tr><td>Grasas</td><td>0 g</td></tr>
+        <tr><td class="zerup-sub-row">De las cuales saturadas</td><td>0 g</td></tr>
+        <tr><td>Hidratos de carbono</td><td>0 g</td></tr>
+        <tr><td class="zerup-sub-row">De los cuales azúcares</td><td>0 g</td></tr>
+        <tr><td>Proteína</td><td>0 g</td></tr>
+        <tr><td>Sal</td><td>0–0,01 g</td></tr>
+      </tbody>
+    </table>
+    <p style="font-size:11px;opacity:0.4;margin-top:12px;font-style:italic;">* Tabla aproximada · puede variar según el sabor. Cada envase contiene 65 ml.</p>
+  </div>
+</div>
+
+
+<style>
+/* ── QUÉ ES — feature grid ── */
+.zerup-features-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 16px;
+}
+.zerup-feat {
+  background: var(--bone-2);
+  border-radius: 0;
+  padding: 24px 20px;
+  border: 1px solid rgba(0,0,0,0.08);
+}
+.zerup-feat-num {
+  font-family: 'Archivo Black', Impact, sans-serif;
+  font-size: clamp(32px, 4vw, 52px);
+  color: var(--green-900);
+  line-height: 1;
+  margin-bottom: 8px;
+  letter-spacing: -0.03em;
+}
+.zerup-feat-icon {
+  color: var(--green-900);
+  margin-bottom: 8px;
+}
+.zerup-feat-title {
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+.zerup-feat-desc {
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  color: rgba(10,20,17,0.6);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* ── BOTÓN TABLA ── */
+.zerup-nutri-btn {
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  background: none;
+  border: 1px solid rgba(10,20,17,0.2);
+}
+.zerup-nutri-btn:hover {
+  border-color: var(--ink);
+}
+
+/* ── POPUP ── */
+.zerup-popup-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(10,20,17,0.5);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.22s ease;
+  padding: 20px;
+}
+.zerup-popup-overlay.is-open {
+  opacity: 1;
+  pointer-events: all;
+}
+.zerup-popup {
+  background: var(--bone);
+  border: 1px solid rgba(0,0,0,0.08);
+  padding: 36px 32px 28px;
+  width: 100%;
+  max-width: 420px;
+  position: relative;
+  transform: translateY(16px) scale(0.97);
+  opacity: 0;
+  transition: transform 0.3s cubic-bezier(0.22,1,0.36,1), opacity 0.22s ease;
+}
+.zerup-popup-overlay.is-open .zerup-popup {
+  transform: translateY(0) scale(1);
+  opacity: 1;
+}
+.zerup-popup-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: 1px solid rgba(0,0,0,0.1);
+  cursor: pointer;
+  color: var(--ink);
+  opacity: 0.5;
+  transition: opacity 0.15s;
+  border-radius: 0;
+}
+.zerup-popup-close:hover { opacity: 1; }
+
+/* ── TABLA NUTRICIONAL ── */
+.zerup-nutri-table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid rgba(0,0,0,0.1);
+}
+.zerup-nutri-table th {
+  background: var(--ink);
+  color: var(--bone);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding: 10px 14px;
+  text-align: left;
+  font-weight: 500;
+}
+.zerup-nutri-table td {
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  padding: 9px 14px;
+  border-bottom: 1px solid rgba(0,0,0,0.07);
+  color: rgba(10,20,17,0.75);
+}
+.zerup-nutri-table tr:last-child td { border-bottom: none; }
+.zerup-nutri-table tr:nth-child(even) td { background: rgba(0,0,0,0.02); }
+.zerup-nutri-table td:last-child {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink);
+  text-align: right;
+}
+.zerup-sub-row { padding-left: 28px !important; opacity: 0.65; }
+
+/* ── PASOS ── */
+.zerup-steps-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin-bottom: 32px;
+}
+.zerup-step {
+  padding: 32px 28px;
+  background: var(--bone-2);
+  border: 1px solid rgba(0,0,0,0.08);
+}
+.zerup-step-num {
+  font-family: 'Archivo Black', Impact, sans-serif;
+  font-size: clamp(56px, 7vw, 96px);
+  color: var(--green-900);
+  line-height: 1;
+  letter-spacing: -0.04em;
+  margin-bottom: 12px;
+}
+.zerup-step-title {
+  font-family: 'Inter', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--ink);
+  margin: 0 0 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+.zerup-step-desc {
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  color: rgba(10,20,17,0.65);
+  line-height: 1.55;
+  margin: 0;
+}
+.zerup-otros-usos {
+  padding: 24px 28px;
+  background: var(--bone-2);
+  border: 1px solid rgba(0,0,0,0.08);
+}
+.zerup-otros-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.zerup-otro {
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  color: rgba(10,20,17,0.7);
+  background: var(--bone);
+  border: 1px solid rgba(0,0,0,0.1);
+  border-radius: 999px;
+  padding: 6px 16px;
+}
+
+/* ── FAQ ACORDEÓN ── */
+.zerup-faq { max-width: 780px; }
+.zerup-faq-item {
+  border-bottom: 1px solid rgba(0,0,0,0.08);
+}
+.zerup-faq-item:last-child { border-bottom: none; }
+.zerup-faq-trigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  background: none;
+  border: none;
+  padding: 28px 0;
+  cursor: pointer;
+  text-align: left;
+}
+.zerup-faq-trigger:hover .zerup-faq-q { color: var(--green-900); }
+.zerup-faq-q {
+  font-family: 'Archivo Black', Impact, sans-serif;
+  font-size: clamp(16px, 2vw, 22px);
+  text-transform: uppercase;
+  color: var(--ink);
+  letter-spacing: -0.02em;
+  margin: 0;
+  line-height: 1;
+  transition: color 0.18s ease;
+}
+.zerup-faq-chevron {
+  flex-shrink: 0;
+  color: var(--ink);
+  opacity: 0.4;
+  transition: transform 0.3s cubic-bezier(0.22,1,0.36,1), opacity 0.18s ease;
+}
+.zerup-faq-trigger[aria-expanded="true"] .zerup-faq-chevron {
+  transform: rotate(180deg);
+  opacity: 1;
+  color: var(--green-900);
+}
+.zerup-faq-trigger[aria-expanded="true"] .zerup-faq-q {
+  color: var(--green-900);
+}
+.zerup-faq-body {
+  overflow: hidden;
+  height: 0;
+  transition: height 0.35s cubic-bezier(0.22,1,0.36,1);
+}
+.zerup-faq-a {
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+  color: rgba(10,20,17,0.7);
+  line-height: 1.65;
+  margin: 0;
+  padding-bottom: 28px;
+  max-width: 680px;
+}
+
+/* ── 3 TIPOS ── */
+.zerup-tipos-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+.zerup-tipo {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  display: flex;
+  flex-direction: column;
+}
+.zerup-tipo--clasico { border-color: rgba(57,255,158,0.3); }
+.zerup-tipo--mocktail { border-color: rgba(255,229,102,0.3); }
+.zerup-tipo--redbull { border-color: rgba(255,229,102,0.5); }
+.zerup-tipo-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 24px 24px 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.zerup-tipo--clasico .zerup-tipo-head { background: rgba(57,255,158,0.06); }
+.zerup-tipo--barista .zerup-tipo-head { background: rgba(255,255,255,0.03); }
+.zerup-tipo--mocktail .zerup-tipo-head { background: rgba(255,229,102,0.06); }
+.zerup-tipo--redbull .zerup-tipo-head { background: rgba(255,229,102,0.1); }
+.zerup-tipo-icon { flex-shrink: 0; margin-top: 4px; }
+.zerup-tipo-icon--mint { color: var(--mint-500); }
+.zerup-tipo-icon--bone { color: rgba(245,243,235,0.7); }
+.zerup-tipo-icon--yellow { color: var(--yellow); }
+.zerup-tipo-name {
+  font-family: 'Archivo Black', Impact, sans-serif;
+  font-size: clamp(16px, 2vw, 22px);
+  text-transform: uppercase;
+  color: #fff;
+  letter-spacing: -0.02em;
+  margin: 0 0 8px;
+  line-height: 1;
+}
+.zerup-tipo-tag { font-size: 10px !important; margin: 0; }
+.zerup-tipo-tag--mint { background: rgba(57,255,158,0.15) !important; color: var(--mint-500) !important; }
+.zerup-tipo-tag--bone { background: rgba(255,255,255,0.08) !important; color: rgba(245,243,235,0.65) !important; }
+.zerup-tipo-tag--yellow { background: rgba(255,229,102,0.15) !important; color: var(--yellow) !important; }
+.zerup-tipo-desc {
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  color: rgba(255,255,255,0.65);
+  line-height: 1.6;
+  padding: 20px 24px 0;
+  margin: 0;
+}
+.zerup-tipo-usos {
+  list-style: none;
+  padding: 16px 24px;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.zerup-tipo--clasico .zerup-tipo-usos li::before { background: var(--mint-500); }
+.zerup-tipo--barista .zerup-tipo-usos li::before { background: rgba(245,243,235,0.5); }
+.zerup-tipo--mocktail .zerup-tipo-usos li::before { background: var(--yellow); }
+.zerup-tipo--redbull .zerup-tipo-usos li::before { background: var(--yellow); }
+.zerup-tipo-usos li {
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  color: rgba(255,255,255,0.65);
+  line-height: 1.5;
+  padding-left: 16px;
+  position: relative;
+}
+.zerup-tipo-usos li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 7px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+}
+.zerup-tipo-sabores {
+  padding: 16px 24px;
+  background: rgba(0,0,0,0.15);
+  margin-top: auto;
+}
+.zerup-sabores-row { display: flex; flex-wrap: wrap; gap: 6px; }
+.zerup-sabor {
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  color: rgba(255,255,255,0.6);
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 999px;
+  padding: 4px 12px;
+}
+.zerup-tipo-resumen {
+  padding: 16px 24px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  background: rgba(0,0,0,0.1);
+}
+.zerup-tipo-resumen p {
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  color: rgba(255,255,255,0.8);
+  line-height: 1.6;
+  margin: 0;
+  font-style: italic;
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 1100px) {
+  .zerup-features-grid { grid-template-columns: repeat(3, 1fr); }
+  .zerup-tipos-grid { grid-template-columns: 1fr; gap: 12px; }
+  .zerup-tipo-head { padding: 20px 20px 16px; }
+  .zerup-tipo-desc,
+  .zerup-tipo-usos,
+  .zerup-tipo-sabores,
+  .zerup-tipo-resumen { padding-left: 20px; padding-right: 20px; }
+}
+@media (max-width: 768px) {
+  .zerup-features-grid { grid-template-columns: repeat(2, 1fr); }
+  .zerup-steps-grid { grid-template-columns: 1fr; gap: 12px; }
+}
+@media (max-width: 480px) {
+  .zerup-features-grid { grid-template-columns: 1fr 1fr; }
+}
+</style>
+
+<script>
+(function () {
+  document.querySelectorAll('.zerup-faq-trigger').forEach(function (trigger) {
+    var body = trigger.nextElementSibling;
+    trigger.addEventListener('click', function () {
+      var isOpen = trigger.getAttribute('aria-expanded') === 'true';
+      document.querySelectorAll('.zerup-faq-trigger[aria-expanded="true"]').forEach(function (open) {
+        open.setAttribute('aria-expanded', 'false');
+        open.nextElementSibling.style.height = '0';
+      });
+      if (!isOpen) {
+        trigger.setAttribute('aria-expanded', 'true');
+        body.style.height = body.scrollHeight + 'px';
+      }
+    });
+  });
+})();
+</script>
+
+<script>
+(function () {
+  const overlay = document.getElementById('zerup-nutri-popup');
+
+  window.zerUpOpenNutri = function () {
+    overlay.classList.add('is-open');
+    overlay.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+  };
+
+  window.zerUpCloseNutri = function () {
+    overlay.classList.remove('is-open');
+    overlay.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+  };
+
+  overlay.addEventListener('click', function (e) {
+    if (e.target === overlay) zerUpCloseNutri();
+  });
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && overlay.classList.contains('is-open')) zerUpCloseNutri();
+  });
+})();
+</script>
+
+
+</div>
+  </main>
+
+  <div id="shopify-section-footer" class="shopify-section"><footer style="color:var(--mint-200);padding:80px 0 32px;margin-top:auto;position:relative;">
+  <div data-parallax-bg style="position:absolute;inset:-4%;background:var(--green-900);pointer-events:none;"></div>
+  <div data-parallax-blob style="position:absolute;right:-120px;top:-100px;width:420px;height:420px;border-radius:50%;background:var(--mint-500);filter:blur(80px);opacity:0.18;pointer-events:none;"></div>
+
+  <div class="container" style="position:relative;">
+
+    <div class="display" style="font-size:clamp(56px,12vw,180px);line-height:0.85;margin-bottom:48px;">
+      0 KCALS<br>
+      <span style="color:var(--mint-500)">MAX VIBE.</span>
+    </div>
+
+    <div class="footer-grid">
+
+      <div><svg xmlns="http://www.w3.org/2000/svg"
+       viewBox="0 0 800 200"
+       width="160" height="40"
+       fill="none"
+       aria-label="0KCALS"
+       style="display:block;flex-shrink:0;">
+    <ellipse cx="90" cy="100" rx="62" ry="82"
+             stroke="currentColor" stroke-width="9" fill="none"/>
+    <text x="185" y="138"
+          fill="currentColor"
+          font-family="'Archivo Black', Impact, sans-serif"
+          font-size="130"
+          letter-spacing="-3">0KCALS</text>
+  </svg><p style="margin-top:16px;font-size:14px;opacity:0.7;max-width:320px;line-height:1.5;">
+          Marketplace peruano de productos premium para una vida más alta. Importamos lo mejor del mundo.
+        </p>
+      </div>
+
+      <div>
+        <div class="eyebrow" style="margin-bottom:16px;opacity:0.5;">Comprar</div>
+        <ul style="display:flex;flex-direction:column;gap:10px;font-size:14px;">
+          <li><a href="/0kcals/collections/all" class="link-underline">Todos los productos</a></li>
+          <li><a href="/0kcals/collections/syrups" class="link-underline">Syrups</a></li>
+          <li><a href="/0kcals/collections/proteina" class="link-underline">Proteína</a></li>
+          <li><a href="/0kcals/collections/snacks" class="link-underline">Snacks</a></li>
+          <li><a href="/0kcals/collections/hidratacion" class="link-underline">Hidratación</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <div class="eyebrow" style="margin-bottom:16px;opacity:0.5;">Compañía</div>
+        <ul style="display:flex;flex-direction:column;gap:10px;font-size:14px;">
+          <li><a href="/0kcals/pages/nosotros" class="link-underline">Nosotros</a></li>
+          <li><a href="/0kcals/pages/contacto" class="link-underline">Contacto</a></li>
+          <li><a href="/0kcals/pages/contacto#marca" class="link-underline">¿Tienes una marca?</a></li>
+          <li><a href="/0kcals/pages/envios" class="link-underline">Envíos</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <div class="eyebrow" style="margin-bottom:16px;opacity:0.5;">Síguenos</div>
+        <ul style="display:flex;flex-direction:column;gap:10px;font-size:14px;"></ul>
+      </div>
+
+    </div>
+
+    <div style="margin-top:48px;padding-top:24px;border-top:1px solid rgba(255,255,255,0.12);display:flex;justify-content:space-between;font-size:12px;opacity:0.6;font-family:'JetBrains Mono',monospace;letter-spacing:0.06em;text-transform:uppercase;">
+      <span>© 2026 0KCALS · Perú</span>
+      <span>Hecho con cero culpa</span>
+    </div>
+
+  </div>
+</footer>
+
+<style>
+.footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 32px; padding-top: 40px; border-top: 1px solid rgba(255,255,255,0.12); }
+@media (max-width: 900px) { .footer-grid { grid-template-columns: 1fr 1fr; gap: 40px; } }
+@media (max-width: 480px) { .footer-grid { grid-template-columns: 1fr; } }
+</style>
+
+
+</div>
+
+  <script>window.__0K = {"base":"/0kcals","wa":"0","waIcon":"\u003csvg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"currentColor\" aria-hidden=\"true\">\n            \u003cpath d=\"M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z\"/>\n          \u003c/svg>","variants":{"1001":{"product_title":"More Zerup Vainilla","vendor":"More Nutrition","url":"/products/more-vainilla","image":"/media/zerup-vainilla.webp","price":3900,"card_color":"#ffe566"},"1002":{"product_title":"More Zerup Peach","vendor":"More Nutrition","url":"/products/more-peach","image":"/media/zerup-peach.webp","price":3900,"card_color":"#b6ffe0"},"1003":{"product_title":"More Zerup Hazelnut","vendor":"More Nutrition","url":"/products/more-hazelnut","image":"/media/zerup-hazelnut.webp","price":3900,"card_color":"#ebe7d8"},"1004":{"product_title":"More Zerup Apple Cranberry","vendor":"More Nutrition","url":"/products/more-apple-cranberry","image":"/media/zerup-apple-cranberry.webp","price":3900,"card_color":"#39ff9e"},"1005":{"product_title":"More Zerup Chocolate","vendor":"More Nutrition","url":"/products/more-chocolate","image":"/media/zerup-chocolate.webp","price":3900,"card_color":"#003d22"}}};</script>
+  <script src="/0kcals/assets/0k-shim.js"></script><script src="/0kcals/assets/cart-drawer.js" type="text/javascript"></script><script src="/0kcals/assets/animations.js" defer></script>
+
+</body>
+</html>
