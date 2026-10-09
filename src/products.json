@@ -1,0 +1,72 @@
+[
+  {
+    "id": 101,
+    "variant_id": 1001,
+    "handle": "more-vainilla",
+    "title": "More Zerup Vainilla",
+    "vendor": "More Nutrition",
+    "price": 3900,
+    "image": "zerup-vainilla.webp",
+    "tags": ["bestseller", "cat:barista"],
+    "card_color": "#ffe566",
+    "card_accent": "#0a1411",
+    "size": "65 ml",
+    "description": "<p>Sirope concentrado sabor vainilla, cero azúcar. Convierte cualquier café, latte o iced coffee en uno de cafetería — sin las calorías de cafetería.</p>"
+  },
+  {
+    "id": 102,
+    "variant_id": 1002,
+    "handle": "more-peach",
+    "title": "More Zerup Peach",
+    "vendor": "More Nutrition",
+    "price": 3900,
+    "image": "zerup-peach.webp",
+    "tags": ["cat:frutales"],
+    "card_color": "#b6ffe0",
+    "card_accent": "#003d22",
+    "size": "65 ml",
+    "description": "<p>Sirope concentrado sabor té helado de melocotón. Unas gotas en agua fría y tienes un peach iced tea sin azúcar, sin culpa.</p>"
+  },
+  {
+    "id": 103,
+    "variant_id": 1003,
+    "handle": "more-hazelnut",
+    "title": "More Zerup Hazelnut",
+    "vendor": "More Nutrition",
+    "price": 3900,
+    "image": "zerup-hazelnut.webp",
+    "tags": ["cat:barista"],
+    "card_color": "#ebe7d8",
+    "card_accent": "#0a1411",
+    "size": "65 ml",
+    "description": "<p>Sirope concentrado sabor avellana, cero azúcar. Para el café de la mañana, el cold brew o el yogurt de la tarde.</p>"
+  },
+  {
+    "id": 104,
+    "variant_id": 1004,
+    "handle": "more-apple-cranberry",
+    "title": "More Zerup Apple Cranberry",
+    "vendor": "More Nutrition",
+    "price": 3900,
+    "image": "zerup-apple-cranberry.webp",
+    "tags": ["nuevo", "cat:frutales"],
+    "card_color": "#39ff9e",
+    "card_accent": "#003d22",
+    "size": "65 ml",
+    "description": "<p>Sirope concentrado sabor manzana y arándano rojo. Un vaso de agua, unas gotas y listo: refresco frutal con cero azúcar.</p>"
+  },
+  {
+    "id": 105,
+    "variant_id": 1005,
+    "handle": "more-chocolate",
+    "title": "More Zerup Chocolate",
+    "vendor": "More Nutrition",
+    "price": 3900,
+    "image": "zerup-chocolate.webp",
+    "tags": ["cat:barista"],
+    "card_color": "#003d22",
+    "card_accent": "#b6ffe0",
+    "size": "65 ml",
+    "description": "<p>Sirope concentrado sabor chocolate, cero azúcar. Mocha en casa, leche chocolatada o un toque en el yogurt.</p>"
+  }
+]
