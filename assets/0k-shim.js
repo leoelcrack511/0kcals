@@ -2,7 +2,7 @@
 //  - answers /cart.js, /cart/add.js, /cart/change.js from a localStorage cart,
 //    so the theme's own cart-drawer.js keeps working untouched
 //  - paints the cart-dependent pages (/cart, /pages/pedido) on the client
-//  - turns the contact forms into a local "¡RECIBIDO!" confirmation
+//  - turns the contact forms into a local "GOT IT!" confirmation
 //  - demo mode: wa.me links show the prebuilt order message instead of opening WhatsApp
 (function () {
   var CFG = window.__0K || { base: '', variants: {} };
@@ -96,11 +96,11 @@
     var box = document.querySelector('#main-content .container');
     if (!box || c.item_count === 0) return;
 
-    var msg = 'Hola! Quiero hacer el siguiente pedido:\n\n' +
+    var msg = 'Hi! I\'d like to place this order:\n\n' +
       c.items.map(function (i) {
         return '• ' + i.quantity + 'x ' + i.product_title + ' — S/ ' + money(i.final_line_price) + '\n';
       }).join('') +
-      '\nTotal: S/ ' + money(c.total_price) + '\n\n¿Cómo procedo con el pago?';
+      '\nTotal: S/ ' + money(c.total_price) + '\n\nHow do I pay?';
     var waUrl = 'https://wa.me/' + CFG.wa + '?text=' + encodeURIComponent(msg);
 
     var rows = c.items.map(function (i, idx) {
@@ -113,7 +113,7 @@
         '<div>' +
           '<div style="font-size:13px;opacity:0.5;margin-bottom:2px;">' + esc(i.vendor) + '</div>' +
           '<div style="font-weight:700;font-size:14px;line-height:1.3;">' + esc(i.product_title) + '</div>' +
-          '<div style="font-size:12px;opacity:0.5;margin-top:4px;">Cant. ' + i.quantity + '</div>' +
+          '<div style="font-size:12px;opacity:0.5;margin-top:4px;">Qty ' + i.quantity + '</div>' +
         '</div>' +
         '<div style="font-family:\'JetBrains Mono\',monospace;font-weight:800;font-size:15px;white-space:nowrap;">S/ ' + money(i.final_line_price) + '</div>' +
       '</div>';
@@ -122,13 +122,13 @@
     box.innerHTML =
       '<div class="eyebrow" style="color:var(--mint-500);margin-bottom:20px;">// CHECKOUT</div>' +
       '<h1 class="display" style="font-size:clamp(44px,8vw,80px);line-height:0.88;margin:0 0 20px;">' +
-        'PAGO POR WEB<br><span style="color:var(--yellow);font-style:italic;">próximamente.</span></h1>' +
+        'ONLINE PAYMENT<br><span style="color:var(--yellow);font-style:italic;">coming soon.</span></h1>' +
       '<div style="margin-bottom:32px;display:flex;justify-content:flex-end;">' +
-        '<a href="' + BASE + '/pages/drop002" class="btn btn--yellow btn--lg page-drop-btn">PRE-ORDENA DROP 002 →</a></div>' +
+        '<a href="' + BASE + '/pages/drop002" class="btn btn--yellow btn--lg page-drop-btn">PRE-ORDER DROP 002 →</a></div>' +
       '<p style="font-size:17px;line-height:1.65;color:rgba(245,243,235,0.7);margin:0 0 48px;max-width:520px;">' +
-        'Mientras tanto puedes completar tu pedido por WhatsApp — te respondemos en minutos y coordinamos el pago y el despacho directo.</p>' +
+        'Meanwhile, you can complete your order on WhatsApp — we reply within minutes and sort out payment and delivery directly.</p>' +
       '<div style="background:rgba(245,243,235,0.05);border:1px solid rgba(245,243,235,0.1);border-radius:16px;padding:28px;margin-bottom:32px;">' +
-        '<div class="eyebrow" style="color:var(--mint-500);margin-bottom:20px;font-size:10px;">TU PEDIDO</div>' + rows +
+        '<div class="eyebrow" style="color:var(--mint-500);margin-bottom:20px;font-size:10px;">YOUR ORDER</div>' + rows +
         '<div style="display:flex;justify-content:space-between;align-items:center;padding-top:20px;margin-top:4px;border-top:1px solid rgba(245,243,235,0.12);">' +
           '<div class="display" style="font-size:20px;">TOTAL</div>' +
           '<div class="display" style="font-size:24px;color:var(--mint-500);">S/ ' + money(c.total_price) + '</div>' +
@@ -136,11 +136,11 @@
       '</div>' +
       '<a href="' + esc(waUrl) + '" target="_blank" rel="noopener" class="btn btn--lg" ' +
         'style="width:100%;justify-content:center;background:#25D366;color:#fff;border-color:#25D366;font-size:18px;gap:12px;text-decoration:none;">' +
-        (CFG.waIcon || '') + ' Enviar pedido por WhatsApp</a>' +
+        (CFG.waIcon || '') + ' Send order via WhatsApp</a>' +
       '<div style="text-align:center;margin-top:16px;font-size:11px;opacity:0.35;font-family:\'JetBrains Mono\',monospace;letter-spacing:0.08em;text-transform:uppercase;">' +
-        'Te respondemos en menos de 24h · Despacho a todo el Perú</div>' +
+        'We reply within 24h · Shipping across Peru</div>' +
       '<div style="margin-top:40px;text-align:center;">' +
-        '<a href="' + BASE + '/cart" style="font-size:13px;opacity:0.4;color:var(--bone);text-decoration:underline;">← Volver a mi bolsa</a></div>';
+        '<a href="' + BASE + '/cart" style="font-size:13px;opacity:0.4;color:var(--bone);text-decoration:underline;">← Back to my bag</a></div>';
   }
 
   // ── Contact forms: no backend, so confirm locally ──
@@ -151,8 +151,8 @@
     if (!form.querySelector('[data-0k-received]')) {
       form.insertAdjacentHTML('afterbegin',
         '<div data-0k-received style="padding:20px;border-radius:16px;background:var(--mint-500);color:var(--green-900);margin-bottom:20px;">' +
-        '<div class="display" style="font-size:20px;margin-bottom:4px;">¡RECIBIDO!</div>' +
-        '<div style="font-size:14px;">Te respondemos en menos de 24h.</div></div>');
+        '<div class="display" style="font-size:20px;margin-bottom:4px;">GOT IT!</div>' +
+        '<div style="font-size:14px;">We\'ll get back to you within 24h.</div></div>');
     }
     form.reset();
   });
@@ -168,16 +168,16 @@
     wrap.id = '0k-wa-demo';
     wrap.setAttribute('role', 'dialog');
     wrap.setAttribute('aria-modal', 'true');
-    wrap.setAttribute('aria-label', 'Demo de portafolio');
+    wrap.setAttribute('aria-label', 'Portfolio demo');
     wrap.style.cssText = 'position:fixed;inset:0;z-index:200;display:grid;place-items:center;padding:20px;' +
       'background:rgba(10,20,17,0.6);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);';
     wrap.innerHTML =
       '<div style="background:var(--bone);color:var(--ink);border-radius:24px;padding:28px;width:100%;max-width:460px;max-height:calc(100vh - 40px);overflow:auto;">' +
-        '<div class="eyebrow" style="margin-bottom:12px;">// DEMO DE PORTAFOLIO</div>' +
-        '<div class="display" style="font-size:clamp(28px,7vw,40px);line-height:0.9;margin-bottom:14px;">ESTO IRÍA<br><span style="color:var(--green-900);">POR WHATSAPP.</span></div>' +
-        '<p style="font-size:14px;line-height:1.55;opacity:0.7;margin:0 0 18px;">En la tienda real, este botón abre WhatsApp con el pedido ya armado. Este es el mensaje que se enviaría:</p>' +
+        '<div class="eyebrow" style="margin-bottom:12px;">// PORTFOLIO DEMO</div>' +
+        '<div class="display" style="font-size:clamp(28px,7vw,40px);line-height:0.9;margin-bottom:14px;">THIS WOULD GO<br><span style="color:var(--green-900);">TO WHATSAPP.</span></div>' +
+        '<p style="font-size:14px;line-height:1.55;opacity:0.7;margin:0 0 18px;">In the live store, this button opens WhatsApp with the order already written out. Here’s the message it would send:</p>' +
         '<pre style="white-space:pre-wrap;font-family:\'JetBrains Mono\',monospace;font-size:12px;line-height:1.6;background:var(--ink);color:var(--mint-200);border-radius:14px;padding:16px;margin:0 0 20px;">' + esc(text) + '</pre>' +
-        '<button type="button" data-0k-wa-close class="btn btn--mint btn--lg" style="width:100%;justify-content:center;">Entendido</button>' +
+        '<button type="button" data-0k-wa-close class="btn btn--mint btn--lg" style="width:100%;justify-content:center;">Got it</button>' +
       '</div>';
     document.body.appendChild(wrap);
     document.body.style.overflow = 'hidden';

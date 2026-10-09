@@ -144,17 +144,17 @@
 
     const header = `
       <div style="padding:24px 28px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(0,0,0,0.08);">
-        <div class="display" style="font-size:28px;">TU BOLSA</div>
-        <button id="cart-close-btn" aria-label="Cerrar" style="width:36px;height:36px;border-radius:999px;border:1.5px solid rgba(0,0,0,0.12);background:transparent;cursor:pointer;font-size:16px;font-weight:700;">✕</button>
+        <div class="display" style="font-size:28px;">YOUR BAG</div>
+        <button id="cart-close-btn" aria-label="Close" style="width:36px;height:36px;border-radius:999px;border:1.5px solid rgba(0,0,0,0.12);background:transparent;cursor:pointer;font-size:16px;font-weight:700;">✕</button>
       </div>`;
 
     if (cart.item_count === 0) {
       inner.innerHTML = header + `
         <div style="flex:1;display:grid;place-items:center;padding:32px;text-align:center;">
           <div>
-            <div class="display" style="font-size:48px;margin-bottom:12px;">VACÍA</div>
-            <p style="opacity:0.6;margin-bottom:20px;">Aún no agregaste nada.<br>Y eso, sí cuesta calorías.</p>
-            <a href="/0kcals/collections/all" class="btn btn--mint">Ver productos →</a>
+            <div class="display" style="font-size:48px;margin-bottom:12px;">EMPTY</div>
+            <p style="opacity:0.6;margin-bottom:20px;">Nothing added yet.<br>Now <em>that</em> costs calories.</p>
+            <a href="/0kcals/collections/all" class="btn btn--mint">Shop products →</a>
           </div>
         </div>`;
       return;
@@ -181,7 +181,7 @@
           </div>
           <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;">
             <span style="font-weight:800;font-family:'JetBrains Mono',monospace;white-space:nowrap;">S/. ${money(item.final_line_price)}</span>
-            <button data-remove-key="${item.key}" aria-label="Eliminar ${item.product_title}" style="opacity:0.4;font-size:12px;background:none;border:0;cursor:pointer;">✕</button>
+            <button data-remove-key="${item.key}" aria-label="Remove ${item.product_title}" style="opacity:0.4;font-size:12px;background:none;border:0;cursor:pointer;">✕</button>
           </div>
         </div>`;
     }).join('');
@@ -190,15 +190,15 @@
       <div style="flex:1;overflow-y:auto;padding:8px 28px;">${items}</div>
       <div style="padding:24px 28px;border-top:1px solid rgba(0,0,0,0.08);background:rgba(0,0,0,0.02);">
         <div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:13px;opacity:0.6;">
-          <span>Envío</span><span>Calculado en checkout</span>
+          <span>Shipping</span><span>Calculated at checkout</span>
         </div>
         <div style="display:flex;justify-content:space-between;margin-bottom:16px;">
           <span class="display" style="font-size:22px;">SUBTOTAL</span>
           <span class="display" style="font-size:22px;">S/. ${money(cart.total_price)}</span>
         </div>
-        <a href="/0kcals/pages/pedido" class="btn btn--mint btn--lg" style="width:100%;justify-content:center;">Ir al checkout →</a>
+        <a href="/0kcals/pages/order" class="btn btn--mint btn--lg" style="width:100%;justify-content:center;">Go to checkout →</a>
         <div style="text-align:center;margin-top:12px;font-size:11px;opacity:0.5;font-family:'JetBrains Mono',monospace;letter-spacing:0.08em;text-transform:uppercase;">
-          Pedido por WhatsApp · Despacho 24h
+          Order via WhatsApp · 24h dispatch
         </div>
       </div>`;
   }
