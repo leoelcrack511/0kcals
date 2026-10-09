@@ -8,6 +8,7 @@ import { Liquid } from 'liquidjs';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { common as i18nCommon, files as i18nFiles } from './src/i18n/en.mjs';
 
 const ROOT = path.dirname(fileURLToPath(import.meta.url));
 const THEME = path.resolve(process.env.THEME_DIR || path.join(ROOT, '../0kcals-theme'));
@@ -21,8 +22,25 @@ const SETTINGS_OVERRIDES = { 'page-drop002': { wa_number: WA_PLACEHOLDER } };
 const read = (p) => fs.readFileSync(p, 'utf8');
 const readJSON = (p) => JSON.parse(read(p));
 
-// ── 1. Copy the theme into .build/, stripping the Shopify-only bits LiquidJS can't parse ──
+// ── 1. Copy the theme into .build/, translated to English and stripped of the
+//       Shopify-only bits LiquidJS can't parse ──
 const schemas = {};
+const i18nSeen = new Set();
+const i18nCommonUsed = new Set();
+
+function translate(rel, src) {
+  i18nSeen.add(rel);
+  for (const [from, to] of i18nFiles[rel] || []) {
+    if (!src.includes(from)) throw new Error(`i18n: not found in ${rel}: "${from.slice(0, 70)}"`);
+    src = src.split(from).join(to);
+  }
+  for (const [from, to] of i18nCommon) {
+    if (!src.includes(from)) continue;
+    src = src.split(from).join(to);
+    i18nCommonUsed.add(from);
+  }
+  return src;
+}
 
 function preprocess(rel, src) {
   src = src.replace(/\{%-?\s*schema\s*-?%\}([\s\S]*?)\{%-?\s*endschema\s*-?%\}/, (_, json) => {
@@ -37,7 +55,12 @@ function preprocess(rel, src) {
   }
   if (rel === 'sections/main-product.liquid') {
     // Ingredient copy was keyed to the original Shopify handles.
-    src = src.replace("h == 'moreee'", "h contains 'peach'").replace("h == 'anaaal'", "h contains 'vainilla'");
+    src = src.replace("h == 'moreee'", "h contains 'peach'").replace("h == 'anaaal'", "h contains 'vanilla'");
+  }
+  if (rel === 'sections/main-404.liquid') {
+    // The giant "0 KCAL HERE" headline broke mid-word on phones and at 1440px; one notch smaller fits.
+    if (!src.includes('font-size:clamp(120px,30vw,480px)')) throw new Error('404 headline size changed in theme');
+    src = src.replace('font-size:clamp(120px,30vw,480px)', 'font-size:clamp(80px,25vw,360px)');
   }
   return src;
 }
@@ -48,7 +71,7 @@ for (const dir of ['layout', 'sections', 'snippets']) {
   for (const f of fs.readdirSync(path.join(THEME, dir))) {
     if (!f.endsWith('.liquid')) continue;
     const rel = `${dir}/${f}`;
-    fs.writeFileSync(path.join(BUILD, rel), preprocess(rel, read(path.join(THEME, rel))));
+    fs.writeFileSync(path.join(BUILD, rel), preprocess(rel, translate(rel, read(path.join(THEME, rel)))));
   }
 }
 
@@ -78,7 +101,7 @@ const makeCollection = (handle, title) => ({
   products_count: products.length,
   all_tags: [...new Set(products.flatMap((p) => p.tags))].sort(),
 });
-const collections = { all: makeCollection('all', 'Productos') };
+const collections = { all: makeCollection('all', 'Products') };
 const emptyCart = { item_count: 0, total_price: 0, items: [] };
 
 // Data the browser-side cart needs (see src/0k-shim.js)
@@ -162,17 +185,17 @@ async function renderSection(engine, type, id, data = {}) {
 // ── 4. Pages ──
 const pageDefs = [
   { url: '/', template: 'index', page_type: 'index' },
-  { url: '/collections/all', template: 'collection', page_type: 'collection', collection: collections.all, title: 'Productos' },
+  { url: '/collections/all', template: 'collection', page_type: 'collection', collection: collections.all, title: 'Products' },
   { url: '/collections/zerups', template: 'collection', page_type: 'collection', collection: makeCollection('zerups', 'Zerups'), title: 'Zerups' },
   { url: '/collections/syrups', template: 'collection', page_type: 'collection', collection: makeCollection('syrups', 'Syrups'), title: 'Syrups' },
   ...products.map((p) => ({ url: p.url, template: 'product', page_type: 'product', product: p, title: p.title })),
-  { url: '/cart', template: 'cart', page_type: 'cart', title: 'Tu bolsa' },
-  { url: '/pages/zerup', template: 'page.zerup', page_type: 'page', title: '¿Qué son los Zerups?' },
-  { url: '/pages/nosotros', template: 'page.nosotros', page_type: 'page', title: 'Nosotros' },
-  { url: '/pages/contacto', template: 'page.contacto', page_type: 'page', title: 'Contacto' },
+  { url: '/cart', template: 'cart', page_type: 'cart', title: 'Your bag' },
+  { url: '/pages/zerup', template: 'page.zerup', page_type: 'page', title: 'What are Zerups?' },
+  { url: '/pages/about', template: 'page.nosotros', page_type: 'page', title: 'About us' },
+  { url: '/pages/contact', template: 'page.contacto', page_type: 'page', title: 'Contact' },
   { url: '/pages/drop002', template: 'page.drop002', page_type: 'page', title: 'Drop 002' },
-  { url: '/pages/pedido', template: 'page.pedido', page_type: 'page', title: 'Tu pedido' },
-  { url: '/404', template: '404', page_type: '404', title: 'Página no encontrada', file: '404.html' },
+  { url: '/pages/order', template: 'page.pedido', page_type: 'page', title: 'Your order' },
+  { url: '/404', template: '404', page_type: '404', title: 'Page not found', file: '404.html' },
 ];
 
 const prefixBase = (s) => (BASE ? s.replace(/(\s(?:href|src|action|poster)=["'])\/(?!\/)/g, `$1${BASE}/`) : s);
@@ -198,7 +221,8 @@ for (const def of pageDefs) {
     collection: def.collection,
   };
   const engine = makeEngine(globals);
-  const tpl = readJSON(path.join(THEME, `templates/${def.template}.json`));
+  const tplFile = `templates/${def.template}.json`;
+  const tpl = JSON.parse(translate(tplFile, read(path.join(THEME, tplFile))));
 
   let content = '';
   for (const id of tpl.order) {
@@ -242,11 +266,14 @@ for (const name of referenced) {
 }
 
 // cart-drawer.js: expose refreshCart so the shim can paint a cart restored from localStorage
-const cartJs = read(path.join(THEME, 'assets/cart-drawer.js'))
+const cartJs = translate('assets/cart-drawer.js', read(path.join(THEME, 'assets/cart-drawer.js')))
   .replace(/\}\)\(\);\s*$/, '  window.__0kRefreshCart = refreshCart;\n})();\n');
 fs.writeFileSync(path.join(OUT, 'assets/cart-drawer.js'), prefixBase(cartJs));
 fs.copyFileSync(path.join(ROOT, 'src/0k-shim.js'), path.join(OUT, 'assets/0k-shim.js'));
 fs.cpSync(path.join(ROOT, 'src/media'), path.join(OUT, 'media'), { recursive: true });
 fs.writeFileSync(path.join(OUT, '.nojekyll'), '');
+
+for (const rel of Object.keys(i18nFiles)) if (!i18nSeen.has(rel)) throw new Error(`i18n: ${rel} was never built`);
+for (const [from] of i18nCommon) if (!i18nCommonUsed.has(from)) console.warn(`  ! i18n common pair unused: "${from}"`);
 
 console.log(`Built ${written.length} pages + ${referenced.size + 2} assets → dist/ (base: "${BASE || '/'}")`);

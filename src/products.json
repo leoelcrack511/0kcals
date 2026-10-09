@@ -2,16 +2,19 @@
   {
     "id": 101,
     "variant_id": 1001,
-    "handle": "more-vainilla",
-    "title": "More Zerup Vainilla",
+    "handle": "more-vanilla",
+    "title": "More Zerup Vanilla",
     "vendor": "More Nutrition",
     "price": 3900,
-    "image": "zerup-vainilla.webp",
-    "tags": ["bestseller", "cat:barista"],
+    "image": "zerup-vanilla.webp",
+    "tags": [
+      "bestseller",
+      "cat:barista"
+    ],
     "card_color": "#ffe566",
     "card_accent": "#0a1411",
     "size": "65 ml",
-    "description": "<p>Sirope concentrado sabor vainilla, cero azúcar. Convierte cualquier café, latte o iced coffee en uno de cafetería — sin las calorías de cafetería.</p>"
+    "description": "<p>Vanilla syrup concentrate, zero sugar. Turns any coffee, latte or iced coffee into a coffee-shop one — without the coffee-shop calories.</p>"
   },
   {
     "id": 102,
@@ -21,11 +24,13 @@
     "vendor": "More Nutrition",
     "price": 3900,
     "image": "zerup-peach.webp",
-    "tags": ["cat:frutales"],
+    "tags": [
+      "cat:fruity"
+    ],
     "card_color": "#b6ffe0",
     "card_accent": "#003d22",
     "size": "65 ml",
-    "description": "<p>Sirope concentrado sabor té helado de melocotón. Unas gotas en agua fría y tienes un peach iced tea sin azúcar, sin culpa.</p>"
+    "description": "<p>Peach iced tea syrup concentrate. A few drops in cold water and you have a peach iced tea — no sugar, no guilt.</p>"
   },
   {
     "id": 103,
@@ -35,11 +40,13 @@
     "vendor": "More Nutrition",
     "price": 3900,
     "image": "zerup-hazelnut.webp",
-    "tags": ["cat:barista"],
+    "tags": [
+      "cat:barista"
+    ],
     "card_color": "#ebe7d8",
     "card_accent": "#0a1411",
     "size": "65 ml",
-    "description": "<p>Sirope concentrado sabor avellana, cero azúcar. Para el café de la mañana, el cold brew o el yogurt de la tarde.</p>"
+    "description": "<p>Hazelnut syrup concentrate, zero sugar. For your morning coffee, your cold brew or your afternoon yogurt.</p>"
   },
   {
     "id": 104,
@@ -49,11 +56,14 @@
     "vendor": "More Nutrition",
     "price": 3900,
     "image": "zerup-apple-cranberry.webp",
-    "tags": ["nuevo", "cat:frutales"],
+    "tags": [
+      "nuevo",
+      "cat:fruity"
+    ],
     "card_color": "#39ff9e",
     "card_accent": "#003d22",
     "size": "65 ml",
-    "description": "<p>Sirope concentrado sabor manzana y arándano rojo. Un vaso de agua, unas gotas y listo: refresco frutal con cero azúcar.</p>"
+    "description": "<p>Apple and cranberry syrup concentrate. A glass of water, a few drops, done: a fruity soda with zero sugar.</p>"
   },
   {
     "id": 105,
@@ -63,10 +73,12 @@
     "vendor": "More Nutrition",
     "price": 3900,
     "image": "zerup-chocolate.webp",
-    "tags": ["cat:barista"],
+    "tags": [
+      "cat:barista"
+    ],
     "card_color": "#003d22",
     "card_accent": "#b6ffe0",
     "size": "65 ml",
-    "description": "<p>Sirope concentrado sabor chocolate, cero azúcar. Mocha en casa, leche chocolatada o un toque en el yogurt.</p>"
+    "description": "<p>Chocolate syrup concentrate, zero sugar. Mochas at home, chocolate milk, or a swirl in your yogurt.</p>"
   }
 ]

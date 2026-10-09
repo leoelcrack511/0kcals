@@ -9,8 +9,8 @@ El sitio se genera desde el código Liquid real del tema (`../0kcals-theme`, sin
 | Catálogo del admin | `src/products.json` + fotos en `src/media/` |
 | `/cart/add.js`, `/cart/change.js`, `/cart.js` | `src/0k-shim.js` responde desde `localStorage`; el `cart-drawer.js` del tema funciona sin cambios |
 | `/cart` y `/pages/pedido` renderizados en servidor | Se pintan en el cliente con el mismo markup |
-| `{% form 'contact' %}` | Muestra la confirmación "¡RECIBIDO!" sin enviar nada |
-| Pedido / pre-orden por WhatsApp | Modo demo: muestra el mensaje armado en vez de abrir WhatsApp (el número real no se publica) |
+| `{% form 'contact' %}` | Muestra la confirmación "GOT IT!" sin enviar nada |
+| Pedido / pre-orden por WhatsApp | Modo demo: muestra el mensaje armado en vez de abrir WhatsApp (el número real no se publica). Todo el texto se traduce al inglés en el build con `src/i18n/en.mjs` |
 
 ## Comandos
 
